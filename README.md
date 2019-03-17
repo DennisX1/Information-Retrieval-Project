@@ -23,7 +23,8 @@ double label; //(?)
 ```
 Utils
 /**
-Computes all similarites between the given reviews. The ordering stays the same: result[0][1] is the similarity between reviews[0] and reviews[1].
+* Computes all similarites between the given reviews. 
+* The ordering stays the same: result[0][1] is the similarity between reviews[0] and reviews[1].
 */
 public static double[][] computeSimilarity(Review[] reviews){…}
 ```
