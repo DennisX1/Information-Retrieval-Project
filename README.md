@@ -22,10 +22,10 @@ double label; //(?)
 
 ```
 Utils
-static double compare(Review r1, Review r2) {
-  String s1 = r1.getText();
-  String s2 = r2.getText();
-}
+/**
+Computes all similarites between the given reviews. The ordering stays the same: result[0][1] is the similarity between reviews[0] and reviews[1].
+*/
+public static double[][] computeSimilarity(Review[] reviews){…}
 ```
 
 Jeder einen eigenen Branch und mergen wenn soweit
