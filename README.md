@@ -22,9 +22,10 @@ double label; //(?)
 
 ```
 Utils
-double compare(Review r1, Review r2) {
-String s1 = r1.getText();
-String s2 = r2.getText();
+static double compare(Review r1, Review r2) {
+  String s1 = r1.getText();
+  String s2 = r2.getText();
+}
 ```
 
 Jeder einen eigenen Branch und mergen wenn soweit
