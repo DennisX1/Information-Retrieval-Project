@@ -23,12 +23,23 @@ public class Review {
         return isKnown;
     }
 
+    public void setKnown(boolean known) {
+        isKnown = known;
+    }
+
     public String getText() {
         return text;
     }
 
+
     @Override
     public String toString() {
-        return "data.Review number " + id + "with the text " + text.substring(0, 40) + "[...]";
+        return "Review{" +
+                "id=" + id +
+                ", text='" + text.substring(0, 40) + "[...]" + '\'' +
+                ", realRating=" + realRating +
+                ", predictedRating=" + predictedRating +
+                ", isKnown=" + isKnown +
+                '}';
     }
 }
