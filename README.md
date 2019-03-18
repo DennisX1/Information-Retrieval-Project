@@ -13,7 +13,7 @@ Art des Graphen implementieren
 Imput data aufräumen
 
 ```
-Review Klasse
+data.Review Klasse
 
 String text;
 int id;  // fortlaufend (1,...,n)
@@ -26,7 +26,7 @@ Utils
 * Computes all similarites between the given reviews. 
 * The ordering stays the same: result[0][1] is the similarity between reviews[0] and reviews[1].
 */
-public static double[][] computeSimilarity(Review[] reviews){…}
+public static double[][] computeSimilarity(data.Review[] reviews){…}
 ```
 
 Jeder einen eigenen Branch und mergen wenn soweit
