@@ -79,6 +79,7 @@ public class UtilsJson {
         try {
             Review[] reviews = getReviewsFromDataset(120, 50, Dataset.AMAZON_INSTANT_VIDEO);
             printReviews(reviews);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -98,5 +99,9 @@ public class UtilsJson {
         Dataset(String path) {
             this.path = path;
         }
+    }
+
+    public static double[] matrixMult(double[][] a, double[][] b) {
+
     }
 }
