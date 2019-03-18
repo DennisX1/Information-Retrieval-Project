@@ -1,6 +1,7 @@
 package main;
 
 import LinkAnalysis.HITS;
+import LinkAnalysis.HITS_Scores;
 import data.Review;
 import data.ReviewGraph;
 
@@ -26,12 +27,7 @@ public class Main {
         //updateAuthMatrix = new double[LIMIT][LIMIT];
         //updateHubsMatrix  = new double [LIMIT][LIMIT];
         HITS algoHITS = new HITS(testGraph);
-
-
-
-
-    System.out.println("Huhu");
-
+        algoHITS.runHITS(new HITS_Scores().ITERATIONS, new HITS_Scores().THRESHOLD);
     }
 
 

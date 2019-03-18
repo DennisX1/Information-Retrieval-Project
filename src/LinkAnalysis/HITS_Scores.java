@@ -56,4 +56,8 @@ public class HITS_Scores {
         authorityScore_prevK = -1.0;
     }
 
+    public void updateScores(double auth, double hub) {
+        authorityScore = auth;
+        hubScore = hub;
+    }
 }
