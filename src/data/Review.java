@@ -29,6 +29,6 @@ public class Review {
 
     @Override
     public String toString() {
-        return "data.Review number " + id + "with the text " + text.substring(0, 40) + "[...]";
+        return "data.Review number " + id + "with the text:" + text.substring(0, 40) + "[...]";
     }
 }
