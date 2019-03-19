@@ -73,6 +73,7 @@ public class UtilsJson {
         br.close();
         return reviews;
     }
+
     public static Review[] readJSONLimit(int limit) throws IOException {
         //No performance issues here so no we use arraylist over a set to keep the ordering consistent
         int i = 0;
@@ -80,12 +81,12 @@ public class UtilsJson {
         JSONObject json;
         String text;
         int rating;
-        Boolean known= true;
+        Boolean known = true;
         BufferedReader br = new BufferedReader(new FileReader("data/Amazon_Instant_Video_5.json"));
         String line = br.readLine();
 
 
-        while (line != null && i < limit ) {
+        while (line != null && i < limit) {
             json = new JSONObject(line);
             text = json.optString("reviewText", null);
             rating = (int) json.getDouble("overall");
@@ -96,7 +97,6 @@ public class UtilsJson {
             i++;
         }
         br.close();
-
 
 
         return reviews.toArray(new Review[0]);
@@ -154,9 +154,9 @@ public class UtilsJson {
             }
         }
 
-        for (int i = 0; i < b.length; i++) { // aRow
-            for (int j = 0; j < a[0].length; j++) { // bColumn
-                for (int k = 0; k < b[0].length; k++) { // aColumn
+        for (int i = 0; i < b.length; i++) {
+            for (int j = 0; j < a[0].length; j++) {
+                for (int k = 0; k < b[0].length; k++) {
                     c[i][j] += b[i][k] * a[k][j];
                 }
             }
@@ -164,23 +164,23 @@ public class UtilsJson {
         return c;
     }
 
-    public static double[][] matrixMultiplicationSameSize(double[][] matrix1, double[][] matrix2) {
-
-        if(matrix1.length ==matrix2.length)
-
-        {
-            double[][] tmp = new double[matrix1.length][matrix1.length];
-            for (int i = 0; i < matrix1.length; i++) { // zeile
-                for (int j = 0; j < matrix2.length; j++) { // spalte
-                    tmp[i][j] = 0;
-                    for (int k = 0; k < matrix1.length && k < matrix2.length; k++) { // iterator
-
-                        tmp[i][j] += matrix1[i][k] * matrix2[k][j];
-                    }
-                }
+    public static double[] vectorMatrixMult(double[] a, double[][] b) {
+        double[] c = new double[b.length];
+        for (int i = 0; i < b.length; i++) {
+            c[i] = 0;
+            for (int j = 0; j < b[0].length; j++) {
+                c[i] = c[i] + a[j] * b[i][j];
             }
-            return tmp;
         }
-        return null;
+        return c;
+    }
+
+    public static boolean isConverged(double[] oldRank, double[] newRank, double epsilon) {
+        for (int i = 0; i < oldRank.length; i++) {
+            if (Math.abs(oldRank[i] - newRank[i]) > epsilon) {
+                return false;
+            }
+        }
+        return true;
     }
 }

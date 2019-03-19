@@ -27,6 +27,10 @@ public class Review {
         isKnown = known;
     }
 
+    public double getRealRating() {
+        return realRating;
+    }
+
     public String getText() {
         return text;
     }
