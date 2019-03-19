@@ -83,7 +83,7 @@ public class MatrixUtils {
         double[] updatedAuthsVec = new double[matrix.length];
 
         for (int row = 0; row < matrix.length; row++) {
-            doublgite sum = 0;
+            double sum = 0;
             for (int column = 0; column < matrix[0].length; column++) {
                 sum += matrix[row][column] * vector[column];
             }
