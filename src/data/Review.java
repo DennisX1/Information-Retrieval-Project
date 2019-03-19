@@ -31,7 +31,6 @@ public class Review {
         return text;
     }
 
-
     @Override
     public String toString() {
         return "Review{" +
