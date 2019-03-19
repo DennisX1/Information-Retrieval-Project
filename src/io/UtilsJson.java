@@ -77,12 +77,28 @@ public class UtilsJson {
 
     public static void main(String[] args) {
         try {
-            Review[] reviews = getReviewsFromDataset(120, 50, Dataset.AMAZON_INSTANT_VIDEO);
-            printReviews(reviews);
+            //   Review[] reviews = getReviewsFromDataset(120, 50, Dataset.AMAZON_INSTANT_VIDEO);
+            //     printReviews(reviews);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+        double[][] a = new double[3][1];
+        double[][] b = new double[2][3];
+        a[0][0] = 1;
+        a[1][0] = 4;
+        a[2][0] = 6;
+
+        b[0][0] = 1;
+        b[1][0] = 2;
+        b[0][1] = 3;
+        b[1][1] = 4;
+        b[0][2] = 5;
+        b[1][2] = 6;
+
+        double[][] c = matrixMult(a, b);
+        System.out.println("[" + c[0][0] + "," + c[1][0] + "]");
+        System.out.println(c.length);
     }
 
     private static void printReviews(Review[] reviews) {
@@ -101,7 +117,42 @@ public class UtilsJson {
         }
     }
 
-    public static double[] matrixMult(double[][] a, double[][] b) {
+    public static double[][] matrixMult(double[][] a, double[][] b) {
+        double[][] c = new double[b.length][a[0].length];
 
+        for (int i = 0; i < c.length; i++) {
+            for (int j = 0; j < c[0].length; j++) {
+                c[i][j] = 0;
+            }
+        }
+
+        for (int i = 0; i < b.length; i++) { // aRow
+            for (int j = 0; j < a[0].length; j++) { // bColumn
+                for (int k = 0; k < b[0].length; k++) { // aColumn
+                    c[i][j] += b[i][k] * a[k][j];
+                }
+            }
+        }
+        return c;
+    }
+
+    public static double[][] matrixMultiplicationSameSize(double[][] matrix1, double[][] matrix2) {
+
+        if(matrix1.length ==matrix2.length)
+
+        {
+            double[][] tmp = new double[matrix1.length][matrix1.length];
+            for (int i = 0; i < matrix1.length; i++) { // zeile
+                for (int j = 0; j < matrix2.length; j++) { // spalte
+                    tmp[i][j] = 0;
+                    for (int k = 0; k < matrix1.length && k < matrix2.length; k++) { // iterator
+
+                        tmp[i][j] += matrix1[i][k] * matrix2[k][j];
+                    }
+                }
+            }
+            return tmp;
+        }
+        return null;
     }
 }
