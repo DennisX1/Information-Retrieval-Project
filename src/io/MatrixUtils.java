@@ -1,5 +1,9 @@
 package io;
 
+/**
+ * Class offering different matrix operations, as well as print operations.
+ * @author N. Seemann
+ */
 public class MatrixUtils {
 
     public static void printMatrixDouble(double[][] matrix) {
