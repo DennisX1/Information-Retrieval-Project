@@ -17,19 +17,22 @@ public class Main {
         return LIMIT;
     }
 
-    private static int LIMIT = 3;
+    private static int LIMIT = 2000;
 
     private static double[][] updateAuthMatrix;
     private static double[][] updateHubsMatrix;
     private static double[][] transposedGraph;
 
     private static void  testHITS(){
-        //updateAuthMatrix = new double[LIMIT][LIMIT];
-        //updateHubsMatrix  = new double [LIMIT][LIMIT];
         HITS algoHITS = new HITS(testGraph);
-        //TODO test which one works correct
+        // TODO test which one works correct
+
+        final long timeStart = System.currentTimeMillis();
         //algoHITS.runHITS(new HITS_Scores().ITERATIONS, new HITS_Scores().THRESHOLD);
-        algoHITS.runHITSV2(new HITS_Scores().ITERATIONS, new HITS_Scores().THRESHOLD);
+        algoHITS.runHITS(20, new HITS_Scores().THRESHOLD);
+        final long timeEnd = System.currentTimeMillis();
+        System.out.println("RT : " + (timeEnd - timeStart) + " Seconds");
+
     }
 
 

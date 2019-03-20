@@ -43,9 +43,8 @@ public class ReviewGraph {
     }
 
     public static void addALLReviewsRANDOM(Review[] revs){
-
         double random;
-        for (int i = 0; i <revs.length-1; i++) {
+        for (int i = 0; i <revs.length; i++) {
             for (int j = i; j <revs.length ; j++) {
                 // if i =j -> 0 since reflective
                 if ( i == j){
@@ -53,7 +52,7 @@ public class ReviewGraph {
                 } else {
                     random = Math.random();
                     weightedGraph[i][j] = random;
-                    weightedGraph[j][i] = random;
+                    weightedGraph[j][i] =random;
                 }
             }
         }
