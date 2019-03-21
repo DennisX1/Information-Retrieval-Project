@@ -38,6 +38,7 @@ public class StopWordRemovalUtils {
 
         try (BufferedReader br = new BufferedReader(new FileReader("/Users/dennisknodler/Desktop/Studium/Master" +
                 "/FSS 2019/Information Retrieval/Projekt/Repository/Information-Retrieval-Project/src/PreprocessingFiles/stopwords_en.txt"))) {
+            //TODO @Dennis bitte die Datei in die Information-Retrieval-Project/Data legen, sodass Nadja und ich das auch nutzen können :)
             String line;
             while ((line = br.readLine()) != null) {
                 stopWordList.add(line);
@@ -55,10 +56,12 @@ public class StopWordRemovalUtils {
 
         for (int i = 0; i < reviews.length; i++) {
             reviews[i].getText().toLowerCase();
+            //TODO @Dennis: du musst den Wert wieder zuweisen, ansonsten wird hier nichts geändert. Glaube dass hier der Fehler fliegt
             System.out.println("ALT  :" + reviews[i].getText());
             for (int j = 0; j < stopWordList.size(); j++) {
                 if (reviews[i].getText().contains(stopWordList.get(j))) {
                     reviews[i].getText().replaceAll(stopWordList.get(j), "");
+                    //TODO @Dennis gleiche wie oben. Du änderst den wert nicht
 
                 }
             }
