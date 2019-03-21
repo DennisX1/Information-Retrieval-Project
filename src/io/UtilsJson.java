@@ -5,7 +5,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
+import Preprocessing.StopWordRemovalUtils;
+import SimMeasuresUtils.TFIDFUtils;
 import data.Review;
+
 
 import org.json.JSONObject;
 
@@ -73,6 +76,7 @@ public class UtilsJson {
         br.close();
         return reviews;
     }
+
     public static Review[] readJSONLimit(int limit) throws IOException {
         //No performance issues here so no we use arraylist over a set to keep the ordering consistent
         int i = 0;
@@ -80,12 +84,12 @@ public class UtilsJson {
         JSONObject json;
         String text;
         int rating;
-        Boolean known= true;
+        Boolean known = true;
         BufferedReader br = new BufferedReader(new FileReader("data/Amazon_Instant_Video_5.json"));
         String line = br.readLine();
 
 
-        while (line != null && i < limit ) {
+        while (line != null && i < limit) {
             json = new JSONObject(line);
             text = json.optString("reviewText", null);
             rating = (int) json.getDouble("overall");
@@ -98,15 +102,18 @@ public class UtilsJson {
         br.close();
 
 
-
         return reviews.toArray(new Review[0]);
 
     }
 
     public static void main(String[] args) {
         try {
-            Review[] reviews = getReviewsFromDataset(120, 50, Dataset.AMAZON_INSTANT_VIDEO);
-            printReviews(reviews);
+            Review[] reviews = getReviewsFromDataset(3, 50, Dataset.AMAZON_INSTANT_VIDEO);
+            //printReviews(reviews);
+            Review[] clean = StopWordRemovalUtils.removeStopWords(reviews);
+            TFIDFUtils.computeSimilarities(clean);
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }

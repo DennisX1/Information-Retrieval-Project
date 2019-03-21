@@ -1,4 +1,8 @@
-public class Main {
+package main;
+
+import SimMeasuresUtils.TFIDFUtils;
+
+public class TestMain {
 
 
     public static void main(String[] args) {
@@ -9,9 +13,13 @@ public class Main {
         String d = "Shipment of gold damaged in a fire";
         String e = "Delivery of silver arrived in a silver truck";
         String f = "Shipment of gold arrived in a truck";
+
+        String g = "Saturn is the gas planet with rings";
+        String h = "";
+        String l = "";
         String [] testAray = {a,b,c};
         String [] testArray1 = {d,e,f};
-        TFIDFUtils.computeSimilarities(testArray1);
+        TFIDFUtils.computeSimilaritiesTEST(testArray1);
     }
 
 }
