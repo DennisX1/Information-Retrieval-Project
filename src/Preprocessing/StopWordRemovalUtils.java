@@ -54,14 +54,20 @@ public class StopWordRemovalUtils {
         reviews = reviewString;
 
         for (int i = 0; i < reviews.length; i++) {
-            reviews[i].getText().toLowerCase();
-            System.out.println("ALT  :" + reviews[i].getText());
+            String temp = reviews[i].getText().toLowerCase();
+            System.out.println("ALT  :" + temp);
             for (int j = 0; j < stopWordList.size(); j++) {
-                if (reviews[i].getText().contains(stopWordList.get(j))) {
-                    reviews[i].getText().replaceAll(stopWordList.get(j), "");
+                if (temp.contains(stopWordList.get(j))) {
+                    String regex = "\\s*\\b"+stopWordList.get(j)+"\\b\\s*";
+                    temp = temp.replaceAll(regex, " ");
+
 
                 }
             }
+            temp = temp.replaceAll("\\W+|\\s+",  " ");
+
+
+            reviewString[i].setText(temp);
 
             System.out.println("NEU  :" + reviews[i].getText());
 
