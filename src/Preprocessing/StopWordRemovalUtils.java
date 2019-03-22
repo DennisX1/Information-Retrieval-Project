@@ -36,8 +36,7 @@ public class StopWordRemovalUtils {
         stopWordList = new ArrayList<>();
 
 
-        try (BufferedReader br = new BufferedReader(new FileReader("/Users/dennisknodler/Desktop/Studium/Master" +
-                "/FSS 2019/Information Retrieval/Projekt/Repository/Information-Retrieval-Project/src/PreprocessingFiles/stopwords_en.txt"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("data/stopwords_en.txt"))) {
             String line;
             while ((line = br.readLine()) != null) {
                 stopWordList.add(line);
@@ -58,13 +57,13 @@ public class StopWordRemovalUtils {
             System.out.println("ALT  :" + temp);
             for (int j = 0; j < stopWordList.size(); j++) {
                 if (temp.contains(stopWordList.get(j))) {
-                    String regex = "\\s*\\b"+stopWordList.get(j)+"\\b\\s*";
+                    String regex = "\\s*\\b" + stopWordList.get(j) + "\\b\\s*";
                     temp = temp.replaceAll(regex, " ");
 
 
                 }
             }
-            temp = temp.replaceAll("\\W+|\\s+",  " ");
+            temp = temp.replaceAll("\\W+|\\s+", " ");
 
 
             reviewString[i].setText(temp);
