@@ -1,5 +1,8 @@
 package io;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 /**
  * Class offering different matrix operations, as well as print operations.
  * @author N. Seemann
@@ -12,9 +15,10 @@ public class MatrixUtils {
     }
 
     public static void printVectorDouble(double[] vector){
+        NumberFormat formatter = new DecimalFormat("#.########");
         StringBuilder print = new StringBuilder("Vector \n");
         for (int i = 0; i < vector.length; i++) {
-            print.append(vector[i] + "\t\t");
+            print.append(formatter.format(vector[i]) + "\t\t");
             print.append("\n");
         }
         System.out.println(print.toString());

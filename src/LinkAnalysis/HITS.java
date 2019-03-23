@@ -1,6 +1,8 @@
 package LinkAnalysis;
 
+import data.Review;
 import data.ReviewGraph;
+import data.Sentiment;
 import io.MatrixUtils;
 import main.Main;
 
@@ -12,6 +14,19 @@ public class HITS {
     private static double[][] updateAuthMatrix;
     private static double[][] updateHubMatrix;
     private static Map<Integer, HITS_Scores> scoreCollection;
+    private static double topK = 0.15;
+    private int[] topKReviews;
+
+    public static final int[][] graph = {{0, 0, 0, 1, 0, 0, 0, 0}, //A
+            {0, 0, 1, 0, 1, 0, 0, 0},
+            {1, 0, 0, 0, 0, 0, 0, 0},
+            {0, 1, 1, 1, 0, 1, 0, 0},
+            {0, 1, 1, 0, 0, 0, 0, 0},
+            {0, 0, 1, 0, 0, 0, 0, 1},
+            {1, 0, 1, 0, 0, 0, 0, 0},
+            {1, 0, 0, 0, 0, 0, 0, 0}, // H
+    };
+
 
 
     public HITS(ReviewGraph graph) {
@@ -61,7 +76,7 @@ public class HITS {
     public void runHITS(int iterations, double exclusionThreshold) {
         double newAuth = 0.0;
         double newHub = 0.0;
-        double[] newHubsVec;
+        double[] newHubsVec = new double[weightedGraph[0].length];
         double[] newAuthsVec = new double[weightedGraph[0].length];
 
         for (int i = 0; i < iterations; i++) {
@@ -81,24 +96,35 @@ public class HITS {
 
             // normalize
             newAuthsVec = normalizeScores(newAuthsVec);
-            //newHubsVec = normalizeScores(newHubsVec);
+            newHubsVec = normalizeScores(newHubsVec);
             updateScoresAllNodes(newAuthsVec, newHubsVec, exclusionThreshold);
+
+            if ( i == iterations - 1){
+                // store top K Scores
+
+                getTopKReviews(newAuthsVec);
+            }
         }
 
         System.out.println("TEST   2:");
         MatrixUtils.printVectorDouble(newAuthsVec);
+        MatrixUtils.printVectorDouble(newHubsVec);
     }
 
     private double[] normalizeScores(double[] scoreVec) {
-        double sumScore = 0.0;
+        double sumScores = 0.0;
         for (int i = 0; i < scoreVec.length; i++) {
-            sumScore += scoreVec[i];
+            sumScores += scoreVec[i];
         }
-        for (int i = 0; i < scoreVec.length; i++) {
-            scoreVec[i] = scoreVec[i] / sumScore;
+        // TODO what to do if the sum is zero?
+        if (sumScores >0.0) {
+            for (int i = 0; i < scoreVec.length; i++) {
+                scoreVec[i] = scoreVec[i] / sumScores;
+            }
         }
         return scoreVec;
     }
+
 
     private void updateScoresAllNodes(double[] newAuthsVec, double[] newHubsVec, double exclusionThreshold) {
         double auth;
@@ -137,15 +163,33 @@ public class HITS {
     }
 
 
-    public static final int[][] graph = {{0, 0, 0, 1, 0, 0, 0, 0}, //A
-            {0, 0, 1, 0, 1, 0, 0, 0},
-            {1, 0, 0, 0, 0, 0, 0, 0},
-            {0, 1, 1, 1, 0, 1, 0, 0},
-            {0, 1, 1, 0, 0, 0, 0, 0},
-            {0, 0, 1, 0, 0, 0, 0, 1},
-            {1, 0, 1, 0, 0, 0, 0, 0},
-            {1, 0, 0, 0, 0, 0, 0, 0}, // H
-    };
+    public Sentiment propagateSentiment(Review[] reviews){
+
+        // for which review?
+        int testNode = 20;
+        Review curRev = reviews[testNode];
 
 
+
+        return null;
+    }
+
+    private int[] getTopKReviews(double[] scoreVec){
+        topKReviews = new int[(int) (weightedGraph.length * topK)];
+
+        for (int i = 0; i < scoreVec.length ; i++) {
+
+
+        }
+        return null;
+
+    }
+
+    private Sentiment caculateSentiment(Review[] reviews){
+
+        // for which review?
+
+
+        return null;
+    }
 }

@@ -17,7 +17,7 @@ public class Main {
         return LIMIT;
     }
 
-    private static int LIMIT = 2000;
+    private static int LIMIT = 200;
 
     private static double[][] updateAuthMatrix;
     private static double[][] updateHubsMatrix;
@@ -32,6 +32,7 @@ public class Main {
         algoHITS.runHITS(20, new HITS_Scores().THRESHOLD);
         final long timeEnd = System.currentTimeMillis();
         System.out.println("RT : " + (timeEnd - timeStart) + " Seconds");
+        algoHITS.propagateSentiment(reviews);
 
     }
 
