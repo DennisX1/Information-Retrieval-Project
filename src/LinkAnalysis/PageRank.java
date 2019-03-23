@@ -4,6 +4,7 @@ import data.Review;
 import io.UtilsJson;
 
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.Random;
 
 public class PageRank {
@@ -14,51 +15,62 @@ public class PageRank {
     public static void main(String[] args) {
         try {
             int amount = 2000;
-            Review[] dataset = UtilsJson.getReviewsFromDataset(amount, 90, UtilsJson.Dataset.AMAZON_INSTANT_VIDEO);
-            Random rnd = new Random(123);
+            Review[] dataset = UtilsJson.getReviewsFromDataset(amount, 7, UtilsJson.Dataset.AMAZON_INSTANT_VIDEO);
+            Random rnd = new Random(1283);
             double[][] weights = new double[amount][amount];
-            double[] sum = new double[weights.length];
+
             for (int i = 0; i < weights.length; i++) {
                 for (int j = 0; j < weights[i].length; j++) {
                     weights[i][j] = rnd.nextDouble();
-                    sum[i] = sum[i] + weights[i][j];
                 }
             }
 
-
-            for (int i = 0; i < weights.length; i++) {
-                for (int j = 0; j < weights[i].length; j++) {
-                    weights[i][j] = weights[i][j] / sum[i];
-                    weights[i][i] = 0;
-                }
-            }
-
-
-            performCalculations(dataset, weights);
+            normalizeWeights(weights);
+           double[] rank =  performCalculations(dataset, weights);
+            System.out.println(Arrays.toString(rank));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static double[] performCalculations(Review[] reviews, double[][] weights) {
-        long startTime = System.currentTimeMillis();
+    private static void normalizeWeights(double[][] weights) {
+        double[] sum = new double[weights.length];
 
+        for (int i = 0; i < weights.length; i++) {
+            for (int j = 0; j < weights[i].length; j++) {
+                sum[i] = sum[i] + weights[i][j];
+            }
+        }
+
+        for (int i = 0; i < weights.length; i++) {
+            for (int j = 0; j < weights[i].length; j++) {
+                weights[i][j] = weights[i][j] / sum[i];
+                weights[i][i] = 0;
+            }
+        }
+    }
+
+    public static double[] performCalculations(Review[] reviews, double[][] weights) {
+        return performCalculations(reviews, weights, 3.0);
+    }
+
+    public static double[] performCalculations(Review[] reviews, double[][] weights, double initalValue) {
+        long startTime = System.currentTimeMillis();
 
         double[] rankNew = new double[reviews.length];
         double[] rank;
         int counter = 0;
-        //init all ranks with (1+2+3+4+5)/5=3
         for (int i = 0; i < rankNew.length; i++) {
-            rankNew[i] = 3;
+            rankNew[i] = initalValue;
         }
         do {
             rank = rankNew;
             rankNew = UtilsJson.vectorMatrixMult(rank, weights);
-            System.out.println("\nIteration " + counter++);
+            System.out.println("\nIteration " + ++counter);
             setKnownReviews(rankNew, reviews);
             printRank(rankNew);
 
-        } while (counter < MAX_ITERATIONS && !UtilsJson.isConverged(rank, rankNew, EPSILON));
+        } while (counter < MAX_ITERATIONS && !PageRank.isConverged(rank, rankNew, EPSILON));
         long elapsedTime = System.currentTimeMillis() - startTime;
         printTime(elapsedTime);
         return rankNew;
@@ -66,9 +78,9 @@ public class PageRank {
 
     private static void printTime(long elapsedTime) {
         double seconds = elapsedTime / 1000.0;
-        int s = (int)(seconds % 60);
-        int m =(int) ((seconds / 60) % 60);
-        int h =(int) ((seconds / (60 * 60)) % 24);
+        int s = (int) (seconds % 60);
+        int m = (int) ((seconds / 60) % 60);
+        int h = (int) ((seconds / (60 * 60)) % 24);
         System.out.println("\nExecution time Page Rank: ");
         System.out.println(String.format("%d:%02d:%02d", h, m, s));
     }
@@ -89,6 +101,15 @@ public class PageRank {
             System.out.print(df.format(rank[i]) + "|");
         }
         System.out.print("]");
+    }
+
+    public static boolean isConverged(double[] oldRank, double[] newRank, double epsilon) {
+        for (int i = 0; i < oldRank.length; i++) {
+            if (Math.abs(oldRank[i] - newRank[i]) > epsilon) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

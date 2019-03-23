@@ -129,12 +129,6 @@ public class UtilsJson {
         System.out.println(c.length);
     }
 
-    private static void printReviews(Review[] reviews) {
-        for (Review r : reviews) {
-            System.out.println(r);
-        }
-    }
-
     public enum Dataset {
         AMAZON_INSTANT_VIDEO("data/Amazon_Instant_Video_5.json");
 
@@ -175,12 +169,5 @@ public class UtilsJson {
         return c;
     }
 
-    public static boolean isConverged(double[] oldRank, double[] newRank, double epsilon) {
-        for (int i = 0; i < oldRank.length; i++) {
-            if (Math.abs(oldRank[i] - newRank[i]) > epsilon) {
-                return false;
-            }
-        }
-        return true;
-    }
+
 }

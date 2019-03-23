@@ -35,6 +35,12 @@ public class Review {
         return text;
     }
 
+    public static void printReviews(Review[] reviews) {
+        for (Review r : reviews) {
+            System.out.println(r);
+        }
+    }
+
     @Override
     public String toString() {
         return "Review{" +
