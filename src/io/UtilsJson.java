@@ -130,13 +130,18 @@ public class UtilsJson {
     }
 
     public enum Dataset {
-        AMAZON_INSTANT_VIDEO("data/Amazon_Instant_Video_5.json");
+        AMAZON_INSTANT_VIDEO("data/Amazon_Instant_Video_5.json", 37126);
 
         private String path;
+        private int maxAmount;
 
+        public int getMaxAmount() {
+            return maxAmount;
+        }
 
-        Dataset(String path) {
+        Dataset(String path, int maxAmount) {
             this.path = path;
+            this.maxAmount = maxAmount;
         }
     }
 

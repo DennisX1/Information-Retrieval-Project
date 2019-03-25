@@ -17,7 +17,7 @@ public class PageRank {
         Review[] dataset = null;
         double[][] weights = null;
         try {
-            int amount = 10;
+            int amount = UtilsJson.Dataset.AMAZON_INSTANT_VIDEO.getMaxAmount();
             dataset = UtilsJson.getReviewsFromDataset(amount, 30, UtilsJson.Dataset.AMAZON_INSTANT_VIDEO);
             Random rnd = new Random(1283);
             weights = new double[amount][amount];
@@ -29,18 +29,48 @@ public class PageRank {
             }
 
             normalizeWeights(weights);
-            double[] rank = performCalculations(dataset, weights);
-            System.out.println(Arrays.toString(rank));
+            performCalculationsLargeScale(dataset, weights, 3);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public static double[] performCalculationsLargeScale(Review[] reviews, double[][] weights) {
+        return performCalculationsLargeScale(reviews, weights, 3.0);
+    }
 
+    public static double[] performCalculationsLargeScale(Review[] reviews, double[][] weights, double initialValue) {
+        long startTime = System.currentTimeMillis();
+        double[] oldRanks;
+        double[] newRanks = new double[reviews.length];
 
+        for (int i = 0; i < newRanks.length; i++) {
+            if (reviews[i].isKnown()) {
+                newRanks[i] = reviews[i].getRealRating();
+            } else {
+                newRanks[i] = initialValue;
+            }
+        }
 
-        return null;
+        normalizeWeights(weights);
+        double sum;
+        int counter = 0;
+
+        do {
+            oldRanks = newRanks;
+            newRanks = new double[reviews.length];
+            for (int i = 0; i < reviews.length; i++) {
+                sum = 0;
+                for (int j = 0; j < reviews.length; j++) {
+                    sum = sum + oldRanks[j] * weights[j][i];
+                }
+                newRanks[i] = sum;
+            }
+        } while (counter++ < MAX_ITERATIONS && !isConverged(oldRanks, newRanks, EPSILON));
+        long elapsedTime = System.currentTimeMillis() - startTime;
+        printTime(elapsedTime);
+        printRank(newRanks);
+        return newRanks;
     }
 
     private static void normalizeWeights(double[][] weights) {
@@ -64,14 +94,14 @@ public class PageRank {
         return performCalculations(reviews, weights, 3.0);
     }
 
-    public static double[] performCalculations(Review[] reviews, double[][] weights, double initalValue) throws OutOfMemoryError {
+    public static double[] performCalculations(Review[] reviews, double[][] weights, double initialValue) throws OutOfMemoryError {
         long startTime = System.currentTimeMillis();
 
         double[] rankNew = new double[reviews.length];
         double[] rank;
         int counter = 0;
         for (int i = 0; i < rankNew.length; i++) {
-            rankNew[i] = initalValue;
+            rankNew[i] = initialValue;
         }
         do {
             rank = rankNew;
@@ -83,6 +113,7 @@ public class PageRank {
         } while (counter < MAX_ITERATIONS && !PageRank.isConverged(rank, rankNew, EPSILON));
         long elapsedTime = System.currentTimeMillis() - startTime;
         printTime(elapsedTime);
+        printRank(rankNew);
         return rankNew;
     }
 
@@ -104,11 +135,12 @@ public class PageRank {
     }
 
     private static void printRank(double[] rank) {
-        System.out.println("Ranks: [");
+        System.out.print("\nRanks: [");
         DecimalFormat df = new DecimalFormat("#.##");
 
         for (int i = 0; i < rank.length; i++) {
-            System.out.print(df.format(rank[i]) + "|");
+            System.out.print(df.format(rank[i]));
+            if (i < rank.length - 1) System.out.print("|");
         }
         System.out.print("]");
     }
