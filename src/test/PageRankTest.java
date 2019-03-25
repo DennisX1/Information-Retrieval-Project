@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
 public class PageRankTest {
 
     @Test
-    public void performCalculations() {
+    public void testPerformCalculations() {
         double[][] weights = new double[4][4];
         weights[0][0] = 0;
         weights[0][1] = 1/3.0;

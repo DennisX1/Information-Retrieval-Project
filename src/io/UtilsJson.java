@@ -37,7 +37,7 @@ public class UtilsJson {
             isKnown.add(i < amount * percentageKnown / 100.0);
         }
         // Shuffle it and give the reviews the data
-        Collections.shuffle(isKnown);
+        Collections.shuffle(isKnown, rnd);
         for (int i = 0; i < amount; i++) {
             result[i] = reviews.get(i);
             result[i].setKnown(isKnown.get(i));
@@ -133,6 +133,7 @@ public class UtilsJson {
         AMAZON_INSTANT_VIDEO("data/Amazon_Instant_Video_5.json");
 
         private String path;
+
 
         Dataset(String path) {
             this.path = path;

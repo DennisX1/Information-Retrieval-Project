@@ -9,15 +9,18 @@ import java.util.Random;
 
 public class PageRank {
     public static final double EPSILON = 0.001;
-    public static final int MAX_ITERATIONS = 1000;
+    public static final int MAX_ITERATIONS = 20000;
 
 
     public static void main(String[] args) {
+
+        Review[] dataset = null;
+        double[][] weights = null;
         try {
-            int amount = 2000;
-            Review[] dataset = UtilsJson.getReviewsFromDataset(amount, 7, UtilsJson.Dataset.AMAZON_INSTANT_VIDEO);
+            int amount = 10;
+            dataset = UtilsJson.getReviewsFromDataset(amount, 30, UtilsJson.Dataset.AMAZON_INSTANT_VIDEO);
             Random rnd = new Random(1283);
-            double[][] weights = new double[amount][amount];
+            weights = new double[amount][amount];
 
             for (int i = 0; i < weights.length; i++) {
                 for (int j = 0; j < weights[i].length; j++) {
@@ -26,11 +29,18 @@ public class PageRank {
             }
 
             normalizeWeights(weights);
-           double[] rank =  performCalculations(dataset, weights);
+            double[] rank = performCalculations(dataset, weights);
             System.out.println(Arrays.toString(rank));
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static double[] performCalculationsLargeScale(Review[] reviews, double[][] weights) {
+
+
+
+        return null;
     }
 
     private static void normalizeWeights(double[][] weights) {
@@ -50,11 +60,11 @@ public class PageRank {
         }
     }
 
-    public static double[] performCalculations(Review[] reviews, double[][] weights) {
+    public static double[] performCalculations(Review[] reviews, double[][] weights) throws OutOfMemoryError {
         return performCalculations(reviews, weights, 3.0);
     }
 
-    public static double[] performCalculations(Review[] reviews, double[][] weights, double initalValue) {
+    public static double[] performCalculations(Review[] reviews, double[][] weights, double initalValue) throws OutOfMemoryError {
         long startTime = System.currentTimeMillis();
 
         double[] rankNew = new double[reviews.length];
