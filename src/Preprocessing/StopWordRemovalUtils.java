@@ -54,7 +54,7 @@ public class StopWordRemovalUtils {
 
         for (int i = 0; i < reviews.length; i++) {
             String temp = reviews[i].getText().toLowerCase();
-            System.out.println("ALT  :" + temp);
+          //  System.out.println("ALT  :" + temp);
             for (int j = 0; j < stopWordList.size(); j++) {
                 if (temp.contains(stopWordList.get(j))) {
                     String regex = "\\s*\\b" + stopWordList.get(j) + "\\b\\s*";
@@ -68,7 +68,7 @@ public class StopWordRemovalUtils {
 
             reviewString[i].setText(temp);
 
-            System.out.println("NEU  :" + reviews[i].getText());
+       //     System.out.println("NEU  :" + reviews[i].getText());
 
         }
         return reviews;

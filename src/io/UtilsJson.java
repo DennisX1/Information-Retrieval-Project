@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
+import Preprocessing.Stemmer;
 import Preprocessing.StopWordRemovalUtils;
 import SimMeasuresUtils.TFIDFUtils;
 import data.Review;
@@ -108,10 +109,29 @@ public class UtilsJson {
 
     public static void main(String[] args) {
         try {
-            Review[] reviews = getReviewsFromDataset(3, 50, Dataset.AMAZON_INSTANT_VIDEO);
+            Review[] reviews = getReviewsFromDataset(100, 50, Dataset.AMAZON_INSTANT_VIDEO);
             //printReviews(reviews);
+            System.out.println("NORMAL HIER");
+            for (int i = 0; i < reviews.length; i++) {
+                System.out.println(reviews[i].getText());
+            }
+
             Review[] clean = StopWordRemovalUtils.removeStopWords(reviews);
-            TFIDFUtils.computeSimilarities(clean);
+
+            System.out.println("STOP WORD HIER");
+            for (int i = 0; i < clean.length; i++) {
+                System.out.println(clean[i].getText());
+            }
+
+
+            Review[] stemmed = Stemmer.stemWord(clean);
+
+
+            System.out.println("STEMMING HIER");
+            for (int i = 0; i < stemmed.length; i++) {
+                System.out.println(stemmed[i].getText());
+            }
+              TFIDFUtils.computeSimilarities(stemmed);
 
 
         } catch (Exception e) {
