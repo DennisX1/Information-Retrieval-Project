@@ -37,7 +37,7 @@ public class UtilsJson {
             isKnown.add(i < amount * percentageKnown / 100.0);
         }
         // Shuffle it and give the reviews the data
-        Collections.shuffle(isKnown);
+        Collections.shuffle(isKnown, rnd);
         for (int i = 0; i < amount; i++) {
             result[i] = reviews.get(i);
             result[i].setKnown(isKnown.get(i));
@@ -73,6 +73,7 @@ public class UtilsJson {
         br.close();
         return reviews;
     }
+
     public static Review[] readJSONLimit(int limit) throws IOException {
         //No performance issues here so no we use arraylist over a set to keep the ordering consistent
         int i = 0;
@@ -80,12 +81,12 @@ public class UtilsJson {
         JSONObject json;
         String text;
         int rating;
-        Boolean known= true;
+        Boolean known = true;
         BufferedReader br = new BufferedReader(new FileReader("data/Amazon_Instant_Video_5.json"));
         String line = br.readLine();
 
 
-        while (line != null && i < limit ) {
+        while (line != null && i < limit) {
             json = new JSONObject(line);
             text = json.optString("reviewText", null);
             rating = (int) json.getDouble("overall");
@@ -98,33 +99,81 @@ public class UtilsJson {
         br.close();
 
 
-
         return reviews.toArray(new Review[0]);
 
     }
 
     public static void main(String[] args) {
         try {
-            Review[] reviews = getReviewsFromDataset(120, 50, Dataset.AMAZON_INSTANT_VIDEO);
-            printReviews(reviews);
+            //   Review[] reviews = getReviewsFromDataset(120, 50, Dataset.AMAZON_INSTANT_VIDEO);
+            //     printReviews(reviews);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+        double[][] a = new double[3][1];
+        double[][] b = new double[2][3];
+        a[0][0] = 1;
+        a[1][0] = 4;
+        a[2][0] = 6;
 
-    private static void printReviews(Review[] reviews) {
-        for (Review r : reviews) {
-            System.out.println(r);
-        }
+        b[0][0] = 1;
+        b[1][0] = 2;
+        b[0][1] = 3;
+        b[1][1] = 4;
+        b[0][2] = 5;
+        b[1][2] = 6;
+
+        double[][] c = matrixMult(a, b);
+        System.out.println("[" + c[0][0] + "," + c[1][0] + "]");
+        System.out.println(c.length);
     }
 
     public enum Dataset {
-        AMAZON_INSTANT_VIDEO("data/Amazon_Instant_Video_5.json");
+        AMAZON_INSTANT_VIDEO("data/Amazon_Instant_Video_5.json", 37126);
 
         private String path;
+        private int maxAmount;
 
-        Dataset(String path) {
+        public int getMaxAmount() {
+            return maxAmount;
+        }
+
+        Dataset(String path, int maxAmount) {
             this.path = path;
+            this.maxAmount = maxAmount;
         }
     }
+
+    public static double[][] matrixMult(double[][] a, double[][] b) {
+        double[][] c = new double[b.length][a[0].length];
+
+        for (int i = 0; i < c.length; i++) {
+            for (int j = 0; j < c[0].length; j++) {
+                c[i][j] = 0;
+            }
+        }
+
+        for (int i = 0; i < b.length; i++) {
+            for (int j = 0; j < a[0].length; j++) {
+                for (int k = 0; k < b[0].length; k++) {
+                    c[i][j] += b[i][k] * a[k][j];
+                }
+            }
+        }
+        return c;
+    }
+
+    public static double[] vectorMatrixMult(double[] a, double[][] b) {
+        double[] c = new double[b.length];
+        for (int i = 0; i < b.length; i++) {
+            c[i] = 0;
+            for (int j = 0; j < b[0].length; j++) {
+                c[i] = c[i] + a[j] * b[i][j];
+            }
+        }
+        return c;
+    }
+
+
 }

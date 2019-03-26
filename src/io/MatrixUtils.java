@@ -5,6 +5,7 @@ import java.text.NumberFormat;
 
 /**
  * Class offering different matrix operations, as well as print operations.
+ *
  * @author N. Seemann
  */
 public class MatrixUtils {
@@ -74,23 +75,34 @@ public class MatrixUtils {
             for (int column = 0; column < matrix[0].length; column++) {
                 //System.out.println("[" + row + ", "+ column + "]:"+ weights[row][column]);
                 double weight =  weights[row][column] ;
-                sum += matrix[row][column] * (vector[column] * weights[row][column]) ;
+                sum += matrix[row][column] * (vector[column] * weights[row][column]);
             }
             updatedVec[row] = sum;
         }
         return updatedVec;
     }
+
     public static double[] multiplyMatrixVector(double[][] matrix, double[] vector){
         double[] updatedVec = new double[matrix.length];
 
         for (int row = 0; row < matrix.length; row++) {
             double sum = 0;
             for (int column = 0; column < matrix[0].length; column++) {
-                sum += matrix[row][column] * vector[column] ;
+                sum += matrix[row][column] * vector[column];
             }
             updatedVec[row] = sum;
         }
         //MatrixUtils.printVectorDouble(updatedVec);
         return updatedVec;
+    }
+
+    public static double[][] transpMatrix(double[][] matrix) {
+        double[][] transp = new double[matrix[0].length][matrix.length];
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[0].length; j++) {
+                transp[j][i] = matrix[i][j];
+            }
+        }
+        return transp;
     }
 }
