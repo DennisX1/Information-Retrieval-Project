@@ -4,6 +4,7 @@ import LinkAnalysis.HITS;
 import LinkAnalysis.HITS_Scores;
 import data.Review;
 import data.ReviewGraph;
+import io.UtilsJson;
 
 import java.io.IOException;
 
@@ -60,8 +61,6 @@ public class Main {
     public static void main(String[] args) {
         testReviewGraph();
         testHITS();
-
-
     }
 
 }
