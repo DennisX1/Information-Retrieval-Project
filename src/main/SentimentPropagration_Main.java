@@ -7,7 +7,7 @@ import data.ReviewGraph;
 import io.UtilsJson;
 
 public class SentimentPropagration_Main {
-    private static final int QUANTITY_REVIEWS= 500;
+    private static final int QUANTITY_REVIEWS= 200;
     private static final int PERCENTAGE_KNOWNLABELS = 50;
     private static final int ITERATIONS= 10;
     private static final double EXCLUSION_THRESHOLD = 0.000000002;

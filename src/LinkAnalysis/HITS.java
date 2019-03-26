@@ -13,7 +13,7 @@ public class HITS {
     private double[][] updateAuthMatrix;
     private double[][] updateHubMatrix;
     private Map<Integer, HITS_Scores> scoreCollection;
-    private int topK = 200;
+    private int topK = 20;
     private int[] topKReviewIDs;
 
 
@@ -133,11 +133,6 @@ public class HITS {
         }
     }
 
-    private double getWeight(int row, int col) {
-        // potenital to save less if symmetric
-        return weightedGraph[row][col];
-    }
-
     private HITS_Scores getScoreFromCollection(int k) {
         HITS_Scores node = scoreCollection.get(k);
         if (node == null) { // not yet in collection
@@ -151,7 +146,6 @@ public class HITS {
         return MatrixUtils.matrixMultiplicationSameSize(matrix1, matrix2);
     }
 
-
     public void propagateSentiment() {
         for (int i = 0; i < quantityReviews; i++) {
             if (!reviews[i].isKnown()) {
@@ -162,8 +156,7 @@ public class HITS {
     }
 
     private void getTopKReviews() {
-        printMap(scoreCollection);
-        // TODO differ between unknown and known label nodes?
+        //printMap(scoreCollection);
         List<Map.Entry<Integer, HITS_Scores>> list = new ArrayList<>(scoreCollection.entrySet());
 
         /*Collections.sort(list, new Comparator<Map.Entry<Integer, HITS_Scores>>() {
@@ -174,10 +167,14 @@ public class HITS {
         });*/
         Collections.sort(list, (o1, o2) -> o2.getValue().compareTo(o1.getValue()));
         int k = 0;
-        for (Map.Entry<Integer, HITS_Scores> entry : list ) {
+        for (Map.Entry<Integer, HITS_Scores> entry : list) {
             if (k < topK) {
+                if (reviews[findPositionOfReview(entry.getKey())].isKnown()) {
+                    continue;
+                }
                 topKReviewIDs[k] = entry.getKey();
                 k++;
+
             } else {
                 break;
             }
@@ -209,9 +206,9 @@ public class HITS {
         rev.setPredictedRating(sentiment);
     }
 
-    public int findPositionOfReview(int ID){
-        for (int i = 0; i <quantityReviews ; i++) {
-            if(reviews[i].getId() == ID){
+    public int findPositionOfReview(int ID) {
+        for (int i = 0; i < quantityReviews; i++) {
+            if (reviews[i].getId() == ID) {
                 return i;
             }
         }
