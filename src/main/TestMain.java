@@ -15,10 +15,10 @@ public class TestMain {
         String f = "Shipment of gold arrived in a truck";
 
         String g = "Saturn is the gas planet with rings";
-        String h = "";
-        String l = "";
+        String h = "Jupiter is the largest gas planet";
+        String l = "Saturn is the Roman god of sowing";
         String [] testAray = {a,b,c};
-        String [] testArray1 = {d,e,f};
+        String [] testArray1 = {g,h,l};
         TFIDFUtils.computeSimilaritiesTEST(testArray1);
     }
 

@@ -109,7 +109,7 @@ public class UtilsJson {
 
     public static void main(String[] args) {
         try {
-            Review[] reviews = getReviewsFromDataset(100, 50, Dataset.AMAZON_INSTANT_VIDEO);
+            Review[] reviews = getReviewsFromDataset(3, 50, Dataset.AMAZON_INSTANT_VIDEO);
             //printReviews(reviews);
             System.out.println("NORMAL HIER");
             for (int i = 0; i < reviews.length; i++) {
@@ -124,7 +124,7 @@ public class UtilsJson {
             }
 
 
-            Review[] stemmed = Stemmer.stemWord(clean);
+            Review[] stemmed = Stemmer.stemReviews(clean);
 
 
             System.out.println("STEMMING HIER");

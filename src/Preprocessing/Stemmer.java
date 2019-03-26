@@ -487,7 +487,7 @@ public class Stemmer {
     }
 
 
-    public static Review[] stemWord(Review[] reviews) {
+    public static Review[] stemReviews(Review[] reviews) {
         Stemmer stemmer = new Stemmer();
 
         for (int i = 0; i < reviews.length; i++) {

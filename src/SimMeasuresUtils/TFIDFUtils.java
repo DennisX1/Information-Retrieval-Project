@@ -4,6 +4,7 @@ import data.Review;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -109,8 +110,11 @@ public class TFIDFUtils {
     }
 
     private double[][] calculateCosineSim(int arraysize) {
+
         DecimalFormat df = new DecimalFormat("#.####");
-        df.setRoundingMode(RoundingMode.CEILING);
+        DecimalFormatSymbols dfs = new DecimalFormatSymbols();
+        dfs.setDecimalSeparator('.');
+        df.setDecimalFormatSymbols(dfs);
 
         double[][] cosineArray = new double[arraysize][arraysize];
 
@@ -126,8 +130,14 @@ public class TFIDFUtils {
                     ArrayList<Double> rowsList = new ArrayList<>();
                     ArrayList<Double> colsList = new ArrayList<>();
 
+                    double numeratorCosine = 0;
+                    double denominatorFirst = 0;
+                    double denominatorSecond = 0;
+
 
                     for (Map.Entry<String, Double> entry : tfValuesForDocumentsMap[row].entrySet()) {
+
+                        denominatorFirst += Math.pow(entry.getValue() * idfValuesForTermMap.get(entry.getKey()), 2);
 
                         if (tfValuesForDocumentsMap[col].containsKey(entry.getKey())) {
 
@@ -138,20 +148,20 @@ public class TFIDFUtils {
                         }
                     }
 
-                    double numeratorCosine = 0;
-                    double denominatorFirst = 0;
-                    double denominatorSecond = 0;
+                    for (Map.Entry<String, Double> entry : tfValuesForDocumentsMap[col].entrySet()) {
+
+                        denominatorSecond += Math.pow(entry.getValue() * idfValuesForTermMap.get(entry.getKey()), 2);
+
+                    }
 
 
                     for (int k = 0; k < rowsList.size(); k++) {
                         numeratorCosine += (rowsList.get(k) * colsList.get(k));
-                        denominatorFirst += rowsList.get(k) * rowsList.get(k);
-                        denominatorSecond += colsList.get(k) * colsList.get(k);
                         //   System.out.println(rowsList.get(k) + "  " + colsList.get(k));
 
                     }
                     if ((denominatorFirst != 0 && denominatorSecond != 0)) {
-                        cosineArray[row][col] = numeratorCosine / (Math.sqrt(denominatorFirst) * Math.sqrt(denominatorSecond));
+                        cosineArray[row][col] = Double.valueOf(df.format(numeratorCosine / (Math.sqrt(denominatorFirst) * Math.sqrt(denominatorSecond))));
 
                     } else {
 
@@ -214,7 +224,7 @@ public class TFIDFUtils {
 
         calculateIDFValues();
 
-        System.out.println(idfValuesForTermMap);
+        System.out.println("IDF VALUES: " + idfValuesForTermMap);
 
         return calculateCosineSim(reviews.length);
 
