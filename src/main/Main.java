@@ -17,7 +17,7 @@ public class Main {
         return LIMIT;
     }
 
-    private static int LIMIT = 200;
+    private static int LIMIT = 35;
 
     private static double[][] updateAuthMatrix;
     private static double[][] updateHubsMatrix;
