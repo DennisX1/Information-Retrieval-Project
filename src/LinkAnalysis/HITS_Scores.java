@@ -42,6 +42,16 @@ public class HITS_Scores {
     }
 
 
+    public int compareTo(HITS_Scores otherScore) {
+        if (this.authorityScore > otherScore.authorityScore) {
+            return 1;
+        }
+        if (this.authorityScore < otherScore.authorityScore) {
+            return -1;
+        }
+        return 0;
+    }
+
     public double getAuthorityScore() {
         return authorityScore;
     }

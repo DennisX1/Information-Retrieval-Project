@@ -8,16 +8,16 @@ import io.UtilsJson;
 
 public class SentimentPropagration_Main {
     private static final int QUANTITY_REVIEWS= 5;
-    private static final int PERCENTAGE_KOWNLABELS = 50;
+    private static final int PERCENTAGE_KNOWNLABELS = 50;
     private static final int ITERATIONS= 10;
-    private static final double EXCLUSION_THRESHOLD = 0.000002;
+    private static final double EXCLUSION_THRESHOLD = 0.000000002;
 
     public static void main(String[] args) {
         /*** get random dataset **/
         Review[] reviews = new Review[QUANTITY_REVIEWS];
         try {
             reviews = UtilsJson.getReviewsFromDataset(
-                    QUANTITY_REVIEWS, PERCENTAGE_KOWNLABELS, UtilsJson.Dataset.AMAZON_INSTANT_VIDEO);
+                    QUANTITY_REVIEWS, PERCENTAGE_KNOWNLABELS, UtilsJson.Dataset.AMAZON_INSTANT_VIDEO);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -32,7 +32,7 @@ public class SentimentPropagration_Main {
 
         /*** create Graph for nodes */
         ReviewGraph graph = new ReviewGraph(QUANTITY_REVIEWS);
-        // TODO add SIM Measure here
+        // TODO add SIM Measure here from Dennis
         graph.addALLReviewsRANDOM(reviews);
         //graph.addALLReviewsRANDOM(reviews, EXCLUSION_THRESHOLD);
         System.out.println(graph.toString());

@@ -2,38 +2,28 @@ package LinkAnalysis;
 
 import data.Review;
 import data.ReviewGraph;
-import data.Sentiment;
 import io.MatrixUtils;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class HITS {
     private double[][] weightedGraph;
-    private  Review[] reviews;
-    private static double[][] updateAuthMatrix;
-    private static double[][] updateHubMatrix;
-    private static Map<Integer, HITS_Scores> scoreCollection;
-    private static int topK = 2;
-    private int[] topKReviews;
-
-    public static final int[][] graph = {{0, 0, 0, 1, 0, 0, 0, 0}, //A
-            {0, 0, 1, 0, 1, 0, 0, 0},
-            {1, 0, 0, 0, 0, 0, 0, 0},
-            {0, 1, 1, 1, 0, 1, 0, 0},
-            {0, 1, 1, 0, 0, 0, 0, 0},
-            {0, 0, 1, 0, 0, 0, 0, 1},
-            {1, 0, 1, 0, 0, 0, 0, 0},
-            {1, 0, 0, 0, 0, 0, 0, 0}, // H
-    };
+    private Review[] reviews;
+    private int quantityReviews;
+    private double[][] updateAuthMatrix;
+    private double[][] updateHubMatrix;
+    private Map<Integer, HITS_Scores> scoreCollection;
+    private int topK = 4;
+    private int[] topKReviewIDs;
 
 
     public HITS(ReviewGraph graph, Review[] reviews) {
-        this.reviews = reviews;
         System.out.println("CHECK if always symmetric and than reduce calculations and sizes");
-        scoreCollection = new HashMap<>();
+        this.reviews = reviews;
+        quantityReviews = reviews.length;
+        topKReviewIDs = new int[topK];
         weightedGraph = graph.getGraph();
-
+        scoreCollection = new HashMap<>();
         /** Regular approach  ***/
         /*
         double[][] transposedGraph = MatrixUtils.transposeMatrix(graph.getGraph());
@@ -50,7 +40,6 @@ public class HITS {
         /******** making use of undirected arcs **********/
         updateAuthMatrix = weightedGraph;
         updateHubMatrix = weightedGraph;
-
     }
 
     private void resetMatrices() {
@@ -75,41 +64,37 @@ public class HITS {
     }
 
     public void runHITS(int iterations, double exclusionThreshold) {
-        double newAuth = 0.0;
-        double newHub = 0.0;
-        double[] newHubsVec = new double[weightedGraph[0].length];
-        double[] newAuthsVec = new double[weightedGraph[0].length];
+        //double[] newHubsVec = new double[quantityReviews];
+        double[] scoreVecHITS = new double[quantityReviews];
 
         for (int i = 0; i < iterations; i++) {
-            //*** update auth
-            double[] vecY = new double[weightedGraph[0].length];
-            double[] vecX = new double[weightedGraph[0].length];
-            for (int j = 0; j < weightedGraph[0].length; j++) { // for each node get score
 
-                HITS_Scores otherNodes = getScoreFromCollection(j);
-                vecX[j] = otherNodes.getAuthorityScore();
+            double[] vecY = new double[quantityReviews];
+            double[] vecX = new double[quantityReviews];
+
+            for (int j = 0; j < quantityReviews; j++) { // for each node get score
+
+                HITS_Scores otherNodes = getScoreFromCollection(reviews[j].getId());
+                //*** vecX[j] = otherNodes.getAuthorityScore();
                 vecY[j] = otherNodes.getHubScore();
             }
 
             //Multiply and save in HitScores
-            newAuthsVec = MatrixUtils.multiplyMatrixVectorWeighted(updateAuthMatrix, vecY, weightedGraph);
-            newHubsVec = MatrixUtils.multiplyMatrixVectorWeighted(updateHubMatrix, vecX, weightedGraph);
+            scoreVecHITS = MatrixUtils.multiplyMatrixVectorWeighted(updateAuthMatrix, vecY, weightedGraph);
+            //*** newHubsVec = MatrixUtils.multiplyMatrixVectorWeighted(updateHubMatrix, vecX, weightedGraph);
 
             // normalize
-            newAuthsVec = normalizeScores(newAuthsVec);
-            newHubsVec = normalizeScores(newHubsVec);
-            updateScoresAllNodes(newAuthsVec, newHubsVec, exclusionThreshold);
+            scoreVecHITS = normalizeScores(scoreVecHITS);
+            //*** newHubsVec = normalizeScores(newHubsVec);
+            updateScoresAllNodes(scoreVecHITS, exclusionThreshold);
 
-            if (i == iterations - 1) {
-                // store top K Scores
 
-                getTopKReviews(newAuthsVec);
-            }
         }
 
         System.out.println("TEST   2:");
-        MatrixUtils.printVectorDouble(newAuthsVec);
-        MatrixUtils.printVectorDouble(newHubsVec);
+        MatrixUtils.printVectorDouble(scoreVecHITS);
+
+        getTopKReviews();
     }
 
     private double[] normalizeScores(double[] scoreVec) {
@@ -118,7 +103,7 @@ public class HITS {
             sumScores += scoreVec[i];
         }
         // TODO what to do if the sum is zero?
-        if (sumScores == 0.0){
+        if (sumScores == 0.0) {
             System.out.println("oh oh this is no good...");
         }
         if (sumScores > 0.0) {
@@ -130,13 +115,13 @@ public class HITS {
     }
 
 
-    private void updateScoresAllNodes(double[] newAuthsVec, double[] newHubsVec, double exclusionThreshold) {
+    private void updateScoresAllNodes(double[] scoreVecHITS, double exclusionThreshold) {
         double auth;
         double hub;
-        for (int i = 0; i < newAuthsVec.length; i++) {
+        for (int i = 0; i < scoreVecHITS.length; i++) {
             HITS_Scores cur = getScoreFromCollection(i);
-            auth = newAuthsVec[i];
-            hub = newHubsVec[i];
+            auth = scoreVecHITS[i];
+            hub = 1.0;
             if (auth < exclusionThreshold) {
                 auth = 0.0;
             }
@@ -168,75 +153,68 @@ public class HITS {
 
 
     public void propagateSentiment() {
-        for (int i = 0; i < reviews.length ; i++) {
-            if (! reviews[i].isKnown()){
+        for (int i = 0; i < quantityReviews; i++) {
+            if (!reviews[i].isKnown()) {
                 calculateSentiment(reviews[i], i);
             }
 
         }
     }
 
-    private int[] getTopKReviews(double[] scoreVec) {
-        // for each node the same?
-        //topKReviews = new int[(int) (weightedGraph.length * topK)];
-        //double[] tmpTopKScores = new double[(int) (weightedGraph.length * topK)];
-        topKReviews = new int[topK];
-        double[] tmpTopKScores = new double[topK];
-        for (int i = 0; i < topKReviews.length; i++) {
-            topKReviews[i] = -1;
-        }
-        double score;
-        double cur;
-        double next;
-        for (int i = 0; i < scoreVec.length; i++) {
-            score =scoreVec[i];
-            for (int j = 0; j < topKReviews.length-1; j++) {
-                if(topKReviews[j] == -1){
-                    // no value yet
-                    topKReviews[j] = i;
-                    break;
-                }else{
-                cur =scoreVec[topKReviews[j]];
-                next = scoreVec[topKReviews[j+1]];
-                if (score < scoreVec[topKReviews[j]]) {
-                    break;
-                } else if (score > scoreVec[topKReviews[j+1]]) {
-                    continue;
-                } else if (score== scoreVec[topKReviews[j+1]]) {
-                    System.out.println("OH oh...");
+    private void getTopKReviews() {
+        printMap(scoreCollection);
+        // TODO differ between unknown and known label nodes?
+        List<Map.Entry<Integer, HITS_Scores>> list = new ArrayList<>(scoreCollection.entrySet());
 
-                } else if ((score < scoreVec[topKReviews[j+1]] && score >  scoreVec[topKReviews[j]])  ) {
-                    int tmp = topKReviews[j];
-                    int tmp2;
-                    topKReviews[j] = i;
-                    for (int k = j - 1; k >= 0; k--) {
-                        tmp2 = topKReviews[k];
-                        topKReviews[k] = tmp;
-                        tmp = tmp2;
-                    }
-
-                }}
-
+        /*Collections.sort(list, new Comparator<Map.Entry<Integer, HITS_Scores>>() {
+            public int compare(Map.Entry< Integer, HITS_Scores> o1,
+                               Map.Entry< Integer, HITS_Scores> o2) {
+                return o2.getValue().compareTo(o1.getValue());
             }
-
+        });*/
+        Collections.sort(list, (o1, o2) -> o2.getValue().compareTo(o1.getValue()));
+        int k = 0;
+        for (Map.Entry<Integer, HITS_Scores> entry : list ) {
+            if (k < topK) {
+                topKReviewIDs[k] = entry.getKey();
+                k++;
+            } else {
+                break;
+            }
         }
-        return topKReviews;
+    }
+
+
+    private static <K, V> void printMap(Map<K, V> map) {
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            System.out.println("Key : " + entry.getKey()
+                    + " Value : " + entry.getValue());
+        }
     }
 
     private void calculateSentiment(Review rev, int positionGraph) {
-        double sentiment= 0.0;
+        double sentiment = 0.0;
         //idea = weight * label over all top K nodes avg by number of nodes
         // SIGMA sim measure * label) /k
         // for which review?
-        int row =positionGraph;
+        int row = positionGraph;
         int column;
-        for (int i = 0; i < topKReviews.length; i++) {
-            column = topKReviews[i];
+        for (int i = 0; i < topK; i++) {
+            column = findPositionOfReview(topKReviewIDs[i]);
             // it this ith  topK Review Label know? add it up
-            if ((reviews[topKReviews[i]]).isKnown()) {
-                sentiment += weightedGraph[row][topKReviews[i]] * reviews[i].getRealRating();
+            if ((reviews[column]).isKnown()) {
+                sentiment += weightedGraph[row][column] * reviews[i].getRealRating();
             }
         }
         rev.setPredictedRating(sentiment);
+    }
+
+    public int findPositionOfReview(int ID){
+        for (int i = 0; i <quantityReviews ; i++) {
+            if(reviews[i].getId() == ID){
+                return i;
+            }
+        }
+        return -1;
     }
 }
