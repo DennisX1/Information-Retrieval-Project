@@ -32,10 +32,11 @@ public class MatrixUtils {
     }
 
     public static String matrixToString(double[][] matrix) {
+        NumberFormat formatter = new DecimalFormat("#.########");
         StringBuilder print = new StringBuilder();
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix.length; j++) { // i=j not good for printing
-                print.append(matrix[i][j] + "\t\t");
+                print.append(formatter.format(matrix[i][j] )+ "\t\t");
             }
             print.append("\n");
         }

@@ -4,17 +4,17 @@ import data.Review;
 import data.ReviewGraph;
 import data.Sentiment;
 import io.MatrixUtils;
-import main.Main;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class HITS {
-    private static double[][] weightedGraph;
+    private double[][] weightedGraph;
+    private  Review[] reviews;
     private static double[][] updateAuthMatrix;
     private static double[][] updateHubMatrix;
     private static Map<Integer, HITS_Scores> scoreCollection;
-    private static double topK = 0.15;
+    private static int topK = 2;
     private int[] topKReviews;
 
     public static final int[][] graph = {{0, 0, 0, 1, 0, 0, 0, 0}, //A
@@ -28,10 +28,10 @@ public class HITS {
     };
 
 
-    public HITS(ReviewGraph graph) {
+    public HITS(ReviewGraph graph, Review[] reviews) {
+        this.reviews = reviews;
         System.out.println("CHECK if always symmetric and than reduce calculations and sizes");
         scoreCollection = new HashMap<>();
-        int limit = new Main().getLIMIT();
         weightedGraph = graph.getGraph();
 
         /** Regular approach  ***/
@@ -47,7 +47,7 @@ public class HITS {
         //updateHubMatrix = MatrixUtils.transposeMatrix(updateAuthMatrix);
         //MatrixUtils.printMatrixDouble(updateHubMatrix, "L*L^T V2");*/
 
-        /******** making use of Symmetry **********/
+        /******** making use of undirected arcs **********/
         updateAuthMatrix = weightedGraph;
         updateHubMatrix = weightedGraph;
 
@@ -118,6 +118,9 @@ public class HITS {
             sumScores += scoreVec[i];
         }
         // TODO what to do if the sum is zero?
+        if (sumScores == 0.0){
+            System.out.println("oh oh this is no good...");
+        }
         if (sumScores > 0.0) {
             for (int i = 0; i < scoreVec.length; i++) {
                 scoreVec[i] = scoreVec[i] / sumScores;
@@ -164,20 +167,21 @@ public class HITS {
     }
 
 
-    public Sentiment propagateSentiment(Review[] reviews) {
+    public void propagateSentiment() {
+        for (int i = 0; i < reviews.length ; i++) {
+            if (! reviews[i].isKnown()){
+                calculateSentiment(reviews[i], i);
+            }
 
-        // for which review?
-        int testNode = 20;
-        Review curRev = reviews[2];
-        caculateSentiment(curRev);
-
-        return null;
+        }
     }
 
     private int[] getTopKReviews(double[] scoreVec) {
         // for each node the same?
-        topKReviews = new int[(int) (weightedGraph.length * topK)];
-        double[] tmpTopKScores = new double[(int) (weightedGraph.length * topK)];
+        //topKReviews = new int[(int) (weightedGraph.length * topK)];
+        //double[] tmpTopKScores = new double[(int) (weightedGraph.length * topK)];
+        topKReviews = new int[topK];
+        double[] tmpTopKScores = new double[topK];
         for (int i = 0; i < topKReviews.length; i++) {
             topKReviews[i] = -1;
         }
@@ -219,17 +223,20 @@ public class HITS {
         return topKReviews;
     }
 
-    private Sentiment caculateSentiment(Review reviews) {
+    private void calculateSentiment(Review rev, int positionGraph) {
         double sentiment= 0.0;
         //idea = weight * label over all top K nodes avg by number of nodes
         // SIGMA sim measure * label) /k
         // for which review?
-        int row =reviews.getId();
+        int row =positionGraph;
         int column;
         for (int i = 0; i < topKReviews.length; i++) {
             column = topKReviews[i];
-            sentiment += weightedGraph[row][topKReviews[i]]  * 11;
+            // it this ith  topK Review Label know? add it up
+            if ((reviews[topKReviews[i]]).isKnown()) {
+                sentiment += weightedGraph[row][topKReviews[i]] * reviews[i].getRealRating();
+            }
         }
-        return null;
+        rev.setPredictedRating(sentiment);
     }
 }
