@@ -56,5 +56,8 @@ public class HITS_Scores {
         return authorityScore;
     }
 
-
+    @Override
+    public String toString() {
+        return "HITS Scores  Auth: " + authorityScore + " Hub: " + hubScore;
+    }
 }

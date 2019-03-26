@@ -13,7 +13,7 @@ public class HITS {
     private double[][] updateAuthMatrix;
     private double[][] updateHubMatrix;
     private Map<Integer, HITS_Scores> scoreCollection;
-    private int topK = 4;
+    private int topK = 200;
     private int[] topKReviewIDs;
 
 
@@ -119,7 +119,7 @@ public class HITS {
         double auth;
         double hub;
         for (int i = 0; i < scoreVecHITS.length; i++) {
-            HITS_Scores cur = getScoreFromCollection(i);
+            HITS_Scores cur = getScoreFromCollection(reviews[i].getId());
             auth = scoreVecHITS[i];
             hub = 1.0;
             if (auth < exclusionThreshold) {
