@@ -6,6 +6,7 @@ import data.Review;
 public class SentimentEvaluation {
     private Review[] allReviews;
     private double sqrMeanError;
+
     public SentimentEvaluation(Review[] reviews){
         allReviews= reviews;
         sqrMeanError=0.0;

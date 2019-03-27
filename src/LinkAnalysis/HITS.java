@@ -13,7 +13,7 @@ public class HITS {
     private double[][] updateAuthMatrix;
     private double[][] updateHubMatrix;
     private Map<Integer, HITS_Scores> scoreCollection;
-    private int topK = 20;
+    private int topK = 200;
     private int[] topKReviewIDs;
 
 
