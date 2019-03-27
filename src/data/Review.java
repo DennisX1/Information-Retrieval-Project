@@ -27,8 +27,18 @@ public class Review {
         isKnown = known;
     }
 
+    public double getRealRating() {
+        return realRating;
+    }
+
     public String getText() {
         return text;
+    }
+
+    public static void printReviews(Review[] reviews) {
+        for (Review r : reviews) {
+            System.out.println(r);
+        }
     }
 
     @Override

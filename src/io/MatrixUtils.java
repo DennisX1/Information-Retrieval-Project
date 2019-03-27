@@ -2,6 +2,7 @@ package io;
 
 /**
  * Class offering different matrix operations, as well as print operations.
+ *
  * @author N. Seemann
  */
 public class MatrixUtils {
@@ -11,7 +12,7 @@ public class MatrixUtils {
 
     }
 
-    public static void printVectorDouble(double[] vector){
+    public static void printVectorDouble(double[] vector) {
         StringBuilder print = new StringBuilder("Graph: \n");
         for (int i = 0; i < vector.length; i++) {
             print.append(vector[i] + "\t\t");
@@ -64,29 +65,40 @@ public class MatrixUtils {
         return null;
     }
 
-    public static double[] multiplyMatrixVectorWeighted(double[][] matrix, double[] vector,double[][] weights){
+    public static double[] multiplyMatrixVectorWeighted(double[][] matrix, double[] vector, double[][] weights) {
         double[] updatedAuthsVec = new double[matrix.length];
 
         for (int row = 0; row < matrix.length; row++) {
             double sum = 0;
             for (int column = 0; column < matrix[0].length; column++) {
                 //System.out.println("[" + row + ", "+ column + "]:"+ weights[row][column]);
-                sum += matrix[row][column] * (vector[column] * weights[row][column]) ;
+                sum += matrix[row][column] * (vector[column] * weights[row][column]);
             }
             updatedAuthsVec[row] = sum;
         }
         return updatedAuthsVec;
     }
-    public static double[] multiplyMatrixVector(double[][] matrix, double[] vector){
+
+    public static double[] multiplyMatrixVector(double[][] matrix, double[] vector) {
         double[] updatedAuthsVec = new double[matrix.length];
 
         for (int row = 0; row < matrix.length; row++) {
             double sum = 0;
             for (int column = 0; column < matrix[0].length; column++) {
-                sum += matrix[row][column] * vector[column] ;
+                sum += matrix[row][column] * vector[column];
             }
             updatedAuthsVec[row] = sum;
         }
         return updatedAuthsVec;
+    }
+
+    public static double[][] transpMatrix(double[][] matrix) {
+        double[][] transp = new double[matrix[0].length][matrix.length];
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[0].length; j++) {
+                transp[j][i] = matrix[i][j];
+            }
+        }
+        return transp;
     }
 }
