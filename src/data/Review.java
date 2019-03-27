@@ -5,6 +5,15 @@ public class Review {
     private int id;
     private String text;
     private double realRating;
+
+    public double getPredictedRating() {
+        return predictedRating;
+    }
+
+    public void setPredictedRating(double predictedRating) {
+        this.predictedRating = predictedRating;
+    }
+
     private double predictedRating;
     private boolean isKnown;
 
