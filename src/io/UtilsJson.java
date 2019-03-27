@@ -1,8 +1,6 @@
 package io;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 import data.Review;
@@ -59,7 +57,8 @@ public class UtilsJson {
         JSONObject json;
         String text;
         int rating;
-        BufferedReader br = new BufferedReader(new FileReader(dataset.path));
+        BufferedReader br = new BufferedReader(new InputStreamReader(
+                new FileInputStream(dataset.path), "UTF-8"));
         String line = br.readLine();
         while (line != null) {
             json = new JSONObject(line);
