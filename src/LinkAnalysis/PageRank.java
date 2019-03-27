@@ -4,7 +4,6 @@ import data.Review;
 import io.UtilsJson;
 
 import java.text.DecimalFormat;
-import java.util.Arrays;
 import java.util.Random;
 
 public class PageRank {
@@ -12,7 +11,7 @@ public class PageRank {
     public static final int MAX_ITERATIONS = 20000;
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         Review[] dataset = null;
         double[][] weights = null;
