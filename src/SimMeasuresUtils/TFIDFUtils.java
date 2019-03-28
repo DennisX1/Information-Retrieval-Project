@@ -1,8 +1,6 @@
 package SimMeasuresUtils;
 
 import data.Review;
-
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.*;
