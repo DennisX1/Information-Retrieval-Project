@@ -1,7 +1,11 @@
 package io;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 /**
  * Class offering different matrix operations, as well as print operations.
+ *
  * @author N. Seemann
  */
 public class MatrixUtils {
@@ -12,9 +16,10 @@ public class MatrixUtils {
     }
 
     public static void printVectorDouble(double[] vector){
-        StringBuilder print = new StringBuilder("Graph: \n");
+        NumberFormat formatter = new DecimalFormat("#.########");
+        StringBuilder print = new StringBuilder("Vector \n");
         for (int i = 0; i < vector.length; i++) {
-            print.append(vector[i] + "\t\t");
+            print.append(formatter.format(vector[i]) + "\t\t");
             print.append("\n");
         }
         System.out.println(print.toString());
@@ -27,10 +32,11 @@ public class MatrixUtils {
     }
 
     public static String matrixToString(double[][] matrix) {
-        StringBuilder print = new StringBuilder("Graph: \n");
+        NumberFormat formatter = new DecimalFormat("#.########");
+        StringBuilder print = new StringBuilder();
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix.length; j++) { // i=j not good for printing
-                print.append(matrix[i][j] + "\t\t");
+                print.append(formatter.format(matrix[i][j] )+ "\t\t");
             }
             print.append("\n");
         }
@@ -51,10 +57,9 @@ public class MatrixUtils {
         if (matrix1.length == matrix2.length) {
             double[][] tmp = new double[matrix1.length][matrix1.length];
             for (int i = 0; i < matrix1.length; i++) { // zeile
-                for (int j = 0; j < matrix2.length; j++) { // spalte
+                for (int j = 0; j < matrix2[0].length; j++) { // spalte
                     tmp[i][j] = 0;
                     for (int k = 0; k < matrix1.length && k < matrix2.length; k++) { // iterator
-
                         tmp[i][j] += matrix1[i][k] * matrix2[k][j];
                     }
                 }
@@ -65,28 +70,40 @@ public class MatrixUtils {
     }
 
     public static double[] multiplyMatrixVectorWeighted(double[][] matrix, double[] vector,double[][] weights){
-        double[] updatedAuthsVec = new double[matrix.length];
-
+        double[] updatedVec = new double[matrix.length];
         for (int row = 0; row < matrix.length; row++) {
             double sum = 0;
             for (int column = 0; column < matrix[0].length; column++) {
                 //System.out.println("[" + row + ", "+ column + "]:"+ weights[row][column]);
-                sum += matrix[row][column] * (vector[column] * weights[row][column]) ;
+                double weight =  weights[row][column] ;
+                sum += matrix[row][column] * (vector[column] * weights[row][column]);
             }
-            updatedAuthsVec[row] = sum;
+            updatedVec[row] = sum;
         }
-        return updatedAuthsVec;
+        return updatedVec;
     }
+
     public static double[] multiplyMatrixVector(double[][] matrix, double[] vector){
-        double[] updatedAuthsVec = new double[matrix.length];
+        double[] updatedVec = new double[matrix.length];
 
         for (int row = 0; row < matrix.length; row++) {
             double sum = 0;
             for (int column = 0; column < matrix[0].length; column++) {
-                sum += matrix[row][column] * vector[column] ;
+                sum += matrix[row][column] * vector[column];
             }
-            updatedAuthsVec[row] = sum;
+            updatedVec[row] = sum;
         }
-        return updatedAuthsVec;
+        //MatrixUtils.printVectorDouble(updatedVec);
+        return updatedVec;
+    }
+
+    public static double[][] transpMatrix(double[][] matrix) {
+        double[][] transp = new double[matrix[0].length][matrix.length];
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[0].length; j++) {
+                transp[j][i] = matrix[i][j];
+            }
+        }
+        return transp;
     }
 }

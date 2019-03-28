@@ -1,8 +1,6 @@
 package io;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 import Preprocessing.Stemmer;
@@ -63,7 +61,8 @@ public class UtilsJson {
         JSONObject json;
         String text;
         int rating;
-        BufferedReader br = new BufferedReader(new FileReader(dataset.path));
+        BufferedReader br = new BufferedReader(new InputStreamReader(
+                new FileInputStream(dataset.path), "UTF-8"));
         String line = br.readLine();
         while (line != null) {
             json = new JSONObject(line);
@@ -109,6 +108,7 @@ public class UtilsJson {
 
     public static void main(String[] args) {
         try {
+<<<<<<< HEAD
             Review[] reviews = getReviewsFromDataset(3, 50, Dataset.AMAZON_INSTANT_VIDEO);
             //printReviews(reviews);
             System.out.println("NORMAL HIER");
@@ -133,25 +133,84 @@ public class UtilsJson {
             }
               TFIDFUtils.computeSimilarities(stemmed);
 
+=======
+            //   Review[] reviews = getReviewsFromDataset(120, 50, Dataset.AMAZON_INSTANT_VIDEO);
+            //     printReviews(reviews);
+>>>>>>> c6da7333998fadedc28a21f9b999844b0d9bb268
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+        double[][] a = new double[3][1];
+        double[][] b = new double[2][3];
+        a[0][0] = 1;
+        a[1][0] = 4;
+        a[2][0] = 6;
 
-    private static void printReviews(Review[] reviews) {
-        for (Review r : reviews) {
-            System.out.println(r);
-        }
+        b[0][0] = 1;
+        b[1][0] = 2;
+        b[0][1] = 3;
+        b[1][1] = 4;
+        b[0][2] = 5;
+        b[1][2] = 6;
+
+        double[][] c = matrixMult(a, b);
+        System.out.println("[" + c[0][0] + "," + c[1][0] + "]");
+        System.out.println(c.length);
     }
 
     public enum Dataset {
-        AMAZON_INSTANT_VIDEO("data/Amazon_Instant_Video_5.json");
+        AMAZON_INSTANT_VIDEO("data/Amazon_Instant_Video_5.json", 37126, 4.209529709637451);
 
         private String path;
+        private int maxAmount;
+        private double averageRating;
 
-        Dataset(String path) {
+        public int getMaxAmount() {
+            return maxAmount;
+        }
+
+        public double getAverageRating() {
+            return averageRating;
+        }
+
+
+        Dataset(String path, int maxAmount, double averageRating) {
             this.path = path;
+            this.maxAmount = maxAmount;
+            this.averageRating = averageRating;
         }
     }
+
+    public static double[][] matrixMult(double[][] a, double[][] b) {
+        double[][] c = new double[b.length][a[0].length];
+
+        for (int i = 0; i < c.length; i++) {
+            for (int j = 0; j < c[0].length; j++) {
+                c[i][j] = 0;
+            }
+        }
+
+        for (int i = 0; i < b.length; i++) {
+            for (int j = 0; j < a[0].length; j++) {
+                for (int k = 0; k < b[0].length; k++) {
+                    c[i][j] += b[i][k] * a[k][j];
+                }
+            }
+        }
+        return c;
+    }
+
+    public static double[] vectorMatrixMult(double[] a, double[][] b) {
+        double[] c = new double[b.length];
+        for (int i = 0; i < b.length; i++) {
+            c[i] = 0;
+            for (int j = 0; j < b[0].length; j++) {
+                c[i] = c[i] + a[j] * b[i][j];
+            }
+        }
+        return c;
+    }
+
+
 }

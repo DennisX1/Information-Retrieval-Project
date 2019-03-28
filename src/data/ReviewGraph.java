@@ -10,7 +10,7 @@ import io.MatrixUtils;
 public class ReviewGraph {
     public static int QUANTITY_NODES  = 2000; // size of the graph / number of nodes we consider
 
-    private static double[][] weightedGraph; // fully connected weightedGraph
+    private  double[][] weightedGraph; // fully connected weightedGraph
 
     public ReviewGraph(int numberOfReviewNodes) {
         weightedGraph = new double[numberOfReviewNodes][numberOfReviewNodes]; // cannot spare a row, due to HITS algo
@@ -42,10 +42,9 @@ public class ReviewGraph {
         return MatrixUtils.matrixToString(weightedGraph);
     }
 
-    public static void addALLReviewsRANDOM(Review[] revs){
-
+    public void addALLReviewsRANDOM(Review[] revs){
         double random;
-        for (int i = 0; i <revs.length-1; i++) {
+        for (int i = 0; i <revs.length; i++) {
             for (int j = i; j <revs.length ; j++) {
                 // if i =j -> 0 since reflective
                 if ( i == j){
@@ -53,7 +52,25 @@ public class ReviewGraph {
                 } else {
                     random = Math.random();
                     weightedGraph[i][j] = random;
-                    weightedGraph[j][i] = random;
+                    weightedGraph[j][i] =random;
+                }
+            }
+        }
+    }
+    public void addALLReviewsRANDOM(Review[] revs, double exclusionthreshold){
+        double random;
+        for (int i = 0; i <revs.length; i++) {
+            for (int j = i; j <revs.length ; j++) {
+                // if i =j -> 0 since reflective
+                if ( i == j){
+                    weightedGraph[i][j] = 1.0;
+                } else {
+                    random = Math.random();
+                    if (random < exclusionthreshold){
+                        random =0.0;
+                    }
+                    weightedGraph[i][j] = random;
+                    weightedGraph[j][i] =random;
                 }
             }
         }

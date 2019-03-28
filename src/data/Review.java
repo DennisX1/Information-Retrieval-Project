@@ -5,6 +5,15 @@ public class Review {
     private int id;
     private String text;
     private double realRating;
+
+    public double getPredictedRating() {
+        return predictedRating;
+    }
+
+    public void setPredictedRating(double predictedRating) {
+        this.predictedRating = predictedRating;
+    }
+
     private double predictedRating;
     private boolean isKnown;
 
@@ -27,12 +36,23 @@ public class Review {
         isKnown = known;
     }
 
+    public double getRealRating() {
+        return realRating;
+    }
+
     public String getText() {
         return text;
     }
 
+<<<<<<< HEAD
     public void setText(String text) {
         this.text = text;
+=======
+    public static void printReviews(Review[] reviews) {
+        for (Review r : reviews) {
+            System.out.println(r);
+        }
+>>>>>>> c6da7333998fadedc28a21f9b999844b0d9bb268
     }
 
     @Override
