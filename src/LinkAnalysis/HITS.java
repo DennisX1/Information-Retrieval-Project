@@ -6,6 +6,13 @@ import io.MatrixUtils;
 
 import java.util.*;
 
+/**
+ * Class to represent the HITS algorithm. It is a slight variation to the original implementation.
+ * Assumptions: HubScore = AuthScore  => therefore, we introduce HITS_Score as the only score
+ * Update Matrix L*L^T = L^T*L
+ * Updating rule: score^k = L * score^(k-1)
+ * Update Matrix L <=> weighted Graph of reviews
+ */
 public class HITS {
     private double[][] weightedGraph;
     private Review[] reviews;
@@ -15,7 +22,12 @@ public class HITS {
     private int topK = 200;
     private int[] topKReviewIDs;
 
-
+    /**
+     * Constructor of the HITS Algorithmm.
+     *
+     * @param graph   Review[] - Array of reviews that should be included
+     * @param reviews []
+     */
     public HITS(ReviewGraph graph, Review[] reviews) {
         System.out.println("CHECK if always symmetric and than reduce calculations and sizes");
         this.reviews = reviews;
@@ -40,26 +52,12 @@ public class HITS {
         updateMatrix = weightedGraph;
     }
 
-    private void resetMatrices() {
-        double[][] transposedGraph = MatrixUtils.transposeMatrix(weightedGraph);
-        //MatrixUtils.printMatrixDouble(weightedGraph, "Initial Graph");
-        //MatrixUtils.printMatrixDouble(transposedGraph, "Transposed Graph");
-
-        updateMatrix = createUpdateMatrix(weightedGraph, transposedGraph);
-        //MatrixUtils.printMatrixDouble(updateMatrix, "L^T*L");
-        //MatrixUtils.printMatrixDouble(updateHubMatrix, "L*L^T");
-        //updateHubMatrix = MatrixUtils.transposeMatrix(updateMatrix);
-        //MatrixUtils.printMatrixDouble(updateHubMatrix, "L*L^T V2");
-        scoreCollection.clear();
-
-    }
-
-    private void resetMatricesNoTransposition() {
-        updateMatrix = weightedGraph;
-        scoreCollection.clear();
-    }
-
-    public void runHITS(int iterations, double exclusionThreshold) {
+    /**
+     * Method the trigger the HITS Algorithm.
+     *
+     * @param iterations int how many iterations should be considered
+     */
+    public void runHITS(int iterations) {
         double[] updatedScores = new double[quantityReviews];
 
         for (int i = 0; i < iterations; i++) {
@@ -85,6 +83,12 @@ public class HITS {
         getTopKReviews();
     }
 
+    /**
+     * Method to normalize the calculated score.
+     *
+     * @param scoreVec double[] array containing the calculated scores
+     * @return normalized double[] array with scores
+     */
     private double[] normalizeScores(double[] scoreVec) {
         double sumScores = 0.0;
         for (int i = 0; i < scoreVec.length; i++) {
@@ -102,7 +106,11 @@ public class HITS {
         return scoreVec;
     }
 
-
+    /**
+     * Method to update the score for each node.
+     *
+     * @param scoreVecHITS double[] normalized, updated scores for all nodes
+     */
     private void updateScoresAllNodes(double[] scoreVecHITS) {
         double score;
         for (int i = 0; i < scoreVecHITS.length; i++) {
@@ -112,6 +120,12 @@ public class HITS {
         }
     }
 
+    /**
+     * Method to obtain the HIT_Score object for a given reviewID.
+     *
+     * @param k int- ID of review
+     * @return HITS_Score - Score object belonging to the given reviewID
+     */
     private HITS_Score getScoreFromCollection(int k) {
         HITS_Score node = scoreCollection.get(k);
         if (node == null) { // not yet in collection
@@ -120,6 +134,7 @@ public class HITS {
         }
         return node;
     }
+
 
     private double[][] createUpdateMatrix(double[][] matrix1, double[][] matrix2) {
         return MatrixUtils.matrixMultiplicationSameSize(matrix1, matrix2);
@@ -185,6 +200,12 @@ public class HITS {
         rev.setPredictedRating(sentiment);
     }
 
+    /**
+     * Method to find the position of a review within the matrix for a given ID.
+     *
+     * @param ID int - reviewID
+     * @return int - position of review in matrix
+     */
     public int findPositionOfReview(int ID) {
         for (int i = 0; i < quantityReviews; i++) {
             if (reviews[i].getId() == ID) {

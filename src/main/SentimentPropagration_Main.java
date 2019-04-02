@@ -32,9 +32,10 @@ public class SentimentPropagration_Main {
 
         /*** create Graph for nodes */
         ReviewGraph graph = new ReviewGraph(QUANTITY_REVIEWS);
-        // TODO add SIM Measure here from Dennis
         graph.addALLReviewsRANDOM(reviews);
-        //graph.addALLReviewsRANDOM(reviews, EXCLUSION_THRESHOLD);
+        /// TODO add SIM Measure here from Dennis
+        // ReviewGraph graph = new ReviewGraph(reviews, double[][] similarities)
+
         System.out.println(graph.toString());
 
         /*** run PageRank Algo */
@@ -51,7 +52,7 @@ public class SentimentPropagration_Main {
 
         /*** run HITS ALgo */
         HITS    HITS_algo = new HITS(graph, reviews);
-        HITS_algo.runHITS(ITERATIONS, EXCLUSION_THRESHOLD);
+        HITS_algo.runHITS(ITERATIONS);
         HITS_algo.propagateSentiment();
 
         SentimentEvaluation evaHITS = new SentimentEvaluation(reviews);

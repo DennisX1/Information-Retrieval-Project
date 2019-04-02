@@ -1,5 +1,6 @@
-package io;
+package test;
 
+import io.MatrixUtils;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

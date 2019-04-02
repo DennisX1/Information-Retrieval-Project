@@ -4,7 +4,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 /**
- * Class offering different matrix operations, as well as print operations.
+ * Class offering different matrix operations, as well as print options.
  *
  * @author N. Seemann
  */
