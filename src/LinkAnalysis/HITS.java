@@ -10,9 +10,8 @@ public class HITS {
     private double[][] weightedGraph;
     private Review[] reviews;
     private int quantityReviews;
-    private double[][] updateAuthMatrix;
-    private double[][] updateHubMatrix;
-    private Map<Integer, HITS_Scores> scoreCollection;
+    private double[][] updateMatrix;
+    private Map<Integer, HITS_Score> scoreCollection;
     private int topK = 200;
     private int[] topKReviewIDs;
 
@@ -30,16 +29,15 @@ public class HITS {
         //MatrixUtils.printMatrixDouble(graph.getGraph(), "Initial Graph");
         //MatrixUtils.printMatrixDouble(transposedGraph, "Transposed Graph");
 
-        updateAuthMatrix = createUpdateMatrix(graph.getGraph(), transposedGraph);
-        //MatrixUtils.printMatrixDouble(updateAuthMatrix, "L^T*L");
+        updateMatrix = createUpdateMatrix(graph.getGraph(), transposedGraph);
+        //MatrixUtils.printMatrixDouble(updateMatrix, "L^T*L");
         updateHubMatrix = createUpdateMatrix(transposedGraph, graph.getGraph());
         //MatrixUtils.printMatrixDouble(updateHubMatrix, "L*L^T");
-        //updateHubMatrix = MatrixUtils.transposeMatrix(updateAuthMatrix);
+        //updateHubMatrix = MatrixUtils.transposeMatrix(updateMatrix);
         //MatrixUtils.printMatrixDouble(updateHubMatrix, "L*L^T V2");*/
 
         /******** making use of undirected arcs **********/
-        updateAuthMatrix = weightedGraph;
-        updateHubMatrix = weightedGraph;
+        updateMatrix = weightedGraph;
     }
 
     private void resetMatrices() {
@@ -47,53 +45,43 @@ public class HITS {
         //MatrixUtils.printMatrixDouble(weightedGraph, "Initial Graph");
         //MatrixUtils.printMatrixDouble(transposedGraph, "Transposed Graph");
 
-        updateAuthMatrix = createUpdateMatrix(weightedGraph, transposedGraph);
-        //MatrixUtils.printMatrixDouble(updateAuthMatrix, "L^T*L");
-        updateHubMatrix = createUpdateMatrix(transposedGraph, weightedGraph);
+        updateMatrix = createUpdateMatrix(weightedGraph, transposedGraph);
+        //MatrixUtils.printMatrixDouble(updateMatrix, "L^T*L");
         //MatrixUtils.printMatrixDouble(updateHubMatrix, "L*L^T");
-        //updateHubMatrix = MatrixUtils.transposeMatrix(updateAuthMatrix);
+        //updateHubMatrix = MatrixUtils.transposeMatrix(updateMatrix);
         //MatrixUtils.printMatrixDouble(updateHubMatrix, "L*L^T V2");
         scoreCollection.clear();
 
     }
 
     private void resetMatricesNoTransposition() {
-        updateAuthMatrix = weightedGraph;
-        updateHubMatrix = weightedGraph;
+        updateMatrix = weightedGraph;
         scoreCollection.clear();
     }
 
     public void runHITS(int iterations, double exclusionThreshold) {
-        //double[] newHubsVec = new double[quantityReviews];
-        double[] scoreVecHITS = new double[quantityReviews];
+        double[] updatedScores = new double[quantityReviews];
 
         for (int i = 0; i < iterations; i++) {
-
-            double[] vecY = new double[quantityReviews];
-            double[] vecX = new double[quantityReviews];
+            double[] oldScoresVec = new double[quantityReviews];
 
             for (int j = 0; j < quantityReviews; j++) { // for each node get score
-
-                HITS_Scores otherNodes = getScoreFromCollection(reviews[j].getId());
-                //*** vecX[j] = otherNodes.getAuthorityScore();
-                vecY[j] = otherNodes.getHubScore();
+                HITS_Score otherNodes = getScoreFromCollection(reviews[j].getId());
+                oldScoresVec[j] = otherNodes.getScore();
             }
 
             //Multiply and save in HitScores
-            scoreVecHITS = MatrixUtils.multiplyMatrixVectorWeighted(updateAuthMatrix, vecY, weightedGraph);
-            //*** newHubsVec = MatrixUtils.multiplyMatrixVectorWeighted(updateHubMatrix, vecX, weightedGraph);
+            updatedScores = MatrixUtils.multiplyMatrixVectorWeighted(updateMatrix, oldScoresVec, weightedGraph);
 
             // normalize
-            scoreVecHITS = normalizeScores(scoreVecHITS);
-            //*** newHubsVec = normalizeScores(newHubsVec);
-            updateScoresAllNodes(scoreVecHITS, exclusionThreshold);
+            updatedScores = normalizeScores(updatedScores);
 
-
+            // Update
+            updateScoresAllNodes(updatedScores);
         }
 
         System.out.println("TEST   2:");
-        MatrixUtils.printVectorDouble(scoreVecHITS);
-
+        MatrixUtils.printVectorDouble(updatedScores);
         getTopKReviews();
     }
 
@@ -115,28 +103,19 @@ public class HITS {
     }
 
 
-    private void updateScoresAllNodes(double[] scoreVecHITS, double exclusionThreshold) {
-        double auth;
-        double hub;
+    private void updateScoresAllNodes(double[] scoreVecHITS) {
+        double score;
         for (int i = 0; i < scoreVecHITS.length; i++) {
-            HITS_Scores cur = getScoreFromCollection(reviews[i].getId());
-            auth = scoreVecHITS[i];
-            hub = 1.0;
-            if (auth < exclusionThreshold) {
-                auth = 0.0;
-            }
-            //*** update hubs
-            if (hub < exclusionThreshold) {
-                hub = 0.0;
-            }
-            cur.updateScores(auth, hub);
+            HITS_Score cur = getScoreFromCollection(reviews[i].getId());
+            score = scoreVecHITS[i];
+            cur.updateScores(score);
         }
     }
 
-    private HITS_Scores getScoreFromCollection(int k) {
-        HITS_Scores node = scoreCollection.get(k);
+    private HITS_Score getScoreFromCollection(int k) {
+        HITS_Score node = scoreCollection.get(k);
         if (node == null) { // not yet in collection
-            node = new HITS_Scores();
+            node = new HITS_Score();
             scoreCollection.put(k, node);
         }
         return node;
@@ -157,7 +136,7 @@ public class HITS {
 
     private void getTopKReviews() {
         //printMap(scoreCollection);
-        List<Map.Entry<Integer, HITS_Scores>> list = new ArrayList<>(scoreCollection.entrySet());
+        List<Map.Entry<Integer, HITS_Score>> list = new ArrayList<>(scoreCollection.entrySet());
 
         /*Collections.sort(list, new Comparator<Map.Entry<Integer, HITS_Scores>>() {
             public int compare(Map.Entry< Integer, HITS_Scores> o1,
@@ -167,7 +146,7 @@ public class HITS {
         });*/
         Collections.sort(list, (o1, o2) -> o2.getValue().compareTo(o1.getValue()));
         int k = 0;
-        for (Map.Entry<Integer, HITS_Scores> entry : list) {
+        for (Map.Entry<Integer, HITS_Score> entry : list) {
             if (k < topK) {
                 if (reviews[findPositionOfReview(entry.getKey())].isKnown()) {
                     continue;

@@ -1,7 +1,6 @@
 package test;
 
 import LinkAnalysis.HITS;
-import LinkAnalysis.HITS_Scores;
 import data.Review;
 import data.ReviewGraph;
 
