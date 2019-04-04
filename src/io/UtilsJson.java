@@ -108,7 +108,6 @@ public class UtilsJson {
 
     public static void main(String[] args) {
         try {
-<<<<<<< HEAD
             Review[] reviews = getReviewsFromDataset(3, 50, Dataset.AMAZON_INSTANT_VIDEO);
             //printReviews(reviews);
             System.out.println("NORMAL HIER");
@@ -133,10 +132,8 @@ public class UtilsJson {
             }
               TFIDFUtils.computeSimilarities(stemmed);
 
-=======
             //   Review[] reviews = getReviewsFromDataset(120, 50, Dataset.AMAZON_INSTANT_VIDEO);
             //     printReviews(reviews);
->>>>>>> c6da7333998fadedc28a21f9b999844b0d9bb268
 
         } catch (Exception e) {
             e.printStackTrace();

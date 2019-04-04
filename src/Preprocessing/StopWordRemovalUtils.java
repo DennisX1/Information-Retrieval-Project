@@ -10,7 +10,12 @@ import java.util.List;
 
 public class StopWordRemovalUtils {
 
+
+
     private static StopWordRemovalUtils instance;
+
+
+
     private List<String> stopWordList;
     private Review[] reviews;
 
@@ -74,5 +79,12 @@ public class StopWordRemovalUtils {
         return reviews;
 
 
+    }
+
+    public static StopWordRemovalUtils getInstance() {
+        return instance;
+    }
+    public List<String> getStopWordList() {
+        return stopWordList;
     }
 }

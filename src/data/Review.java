@@ -44,15 +44,14 @@ public class Review {
         return text;
     }
 
-<<<<<<< HEAD
     public void setText(String text) {
         this.text = text;
-=======
+
+    }
     public static void printReviews(Review[] reviews) {
         for (Review r : reviews) {
             System.out.println(r);
         }
->>>>>>> c6da7333998fadedc28a21f9b999844b0d9bb268
     }
 
     @Override
