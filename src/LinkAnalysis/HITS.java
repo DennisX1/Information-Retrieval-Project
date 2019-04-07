@@ -4,6 +4,7 @@ import data.Review;
 import data.ReviewGraph;
 import io.MatrixUtils;
 
+import javax.swing.*;
 import java.util.*;
 
 /**
@@ -21,6 +22,10 @@ public class HITS {
     private Map<Integer, HITS_Score> scoreCollection;
     private int topK = 200;
     private int[] topKReviewIDs;
+    private boolean converged;
+    public static final double EPSILON = 0.0001;
+    public static final int MAX_ITERATIONS = 30;
+
 
     /**
      * Constructor of the HITS Algorithmm.
@@ -35,6 +40,7 @@ public class HITS {
         topKReviewIDs = new int[topK];
         weightedGraph = graph.getGraph();
         scoreCollection = new HashMap<>();
+        converged = false;
         /** Regular approach  ***/
         /*
         double[][] transposedGraph = MatrixUtils.transposeMatrix(graph.getGraph());
@@ -78,9 +84,66 @@ public class HITS {
             updateScoresAllNodes(updatedScores);
         }
 
-        System.out.println("TEST   2:");
+        System.out.println("Final Hit Scores V1:");
         MatrixUtils.printVectorDouble(updatedScores);
         getTopKReviews();
+        propagateSentiment();
+    }
+
+    /**
+     * Method the trigger the HITS Algorithm.
+     *
+     *
+     */
+    public void runHITSV2() {
+
+        //for all nodes with unknown labels init
+        for (int j = 0; j < quantityReviews; j++) { // for each node get score
+            if ( !reviews[j].isKnown()){ // node with unknown label
+                putScoreToCollection(reviews[j].getId(), -1.0);
+            }else {
+                putScoreToCollection(reviews[j].getId(), reviews[j].getRealRating());
+            }
+        }
+        startPropagation();
+
+    }
+    private void startPropagation(){
+        double[] updatedScores = new double[quantityReviews];
+        int iterations =1;
+        while (!converged && iterations < MAX_ITERATIONS ) {
+            System.out.println("Iteration: "+ iterations);
+            double[] oldScoresVec = new double[quantityReviews];
+            for (int j = 0; j < quantityReviews; j++) { // for each node get score
+                HITS_Score otherNodes = getScoreFromCollection(reviews[j].getId());
+                oldScoresVec[j] = otherNodes.getScore();
+            }
+            MatrixUtils.printVectorDouble(oldScoresVec);
+            //Multiply and save in HitScores
+            updatedScores = MatrixUtils.multiplyMatrixVectorWeighted(updateMatrix, oldScoresVec, weightedGraph);
+
+            // normalize
+            //updatedScores = normalizeScores(updatedScores);
+            MatrixUtils.printVectorDouble(updatedScores);
+            // Update
+            updateScoresAllNodes(updatedScores);
+            iterations++;
+        }
+
+        writePredictions(updatedScores);
+
+        System.out.println("Final HIT Scores:");
+        MatrixUtils.printVectorDouble(updatedScores);
+
+
+    }
+
+    private void writePredictions(double[] updatedScores) {
+        for (int j = 0; j < quantityReviews; j++) { // for each node get score
+            if (!reviews[j].isKnown()){
+                reviews[j].setPredictedRating(updatedScores[j]);
+            }
+        }
     }
 
     /**
@@ -90,6 +153,8 @@ public class HITS {
      * @return normalized double[] array with scores
      */
     private double[] normalizeScores(double[] scoreVec) {
+        System.out.println("Before normalization");
+        MatrixUtils.printVectorDouble(scoreVec);
         double sumScores = 0.0;
         for (int i = 0; i < scoreVec.length; i++) {
             sumScores += scoreVec[i];
@@ -114,10 +179,36 @@ public class HITS {
     private void updateScoresAllNodes(double[] scoreVecHITS) {
         double score;
         for (int i = 0; i < scoreVecHITS.length; i++) {
-            HITS_Score cur = getScoreFromCollection(reviews[i].getId());
-            score = scoreVecHITS[i];
-            cur.updateScores(score);
+            if (!reviews[i].isKnown()){
+                HITS_Score cur = getScoreFromCollection(reviews[i].getId());
+                score = scoreVecHITS[i];
+                // convergence
+                if( Math.abs(cur.getScore()-score) < EPSILON){
+                    converged = true;
+                }
+                cur.updateScores(score);
+            }
         }
+    }
+
+    /**
+     * Add new Score to scoreCollection -only for Nodes with an unknown label
+     * @return store in collection successful
+     */
+    private boolean putScoreToCollection(int k, double rating) {
+        HITS_Score node = scoreCollection.get(k);
+        if (node == null) { // not yet in collection
+            if (rating == -1.0) {
+                node = new HITS_Score();
+                scoreCollection.put(k, node);
+                return true;
+            } else {
+                node = new HITS_Score(rating);
+                scoreCollection.put(k, node);
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

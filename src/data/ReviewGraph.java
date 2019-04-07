@@ -100,7 +100,7 @@ public class ReviewGraph {
             for (int j = i; j < revs.length; j++) {
                 // if i =j -> 0 since reflective
                 if (i == j) {
-                    weightedGraph[i][j] = 1.0;
+                    weightedGraph[i][j] = 0.0;
                 } else {
                     random = Math.random();
                     if (random < exclusionthreshold) {

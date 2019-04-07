@@ -7,10 +7,10 @@ import data.ReviewGraph;
 import io.UtilsJson;
 
 public class SentimentPropagration_Main {
-    private static final int QUANTITY_REVIEWS= 2000;
-    private static final int PERCENTAGE_KNOWNLABELS = 50;
+    private static final int QUANTITY_REVIEWS= 5;
+    private static final int PERCENTAGE_KNOWNLABELS = 30;
     private static final int ITERATIONS= 10;
-    private static final double EXCLUSION_THRESHOLD = 0.000000002;
+    private static final double EXCLUSION_THRESHOLD = 0.000002;
 
     public static void main(String[] args) {
         /*** get random dataset **/
@@ -52,8 +52,9 @@ public class SentimentPropagration_Main {
 
         /*** run HITS ALgo */
         HITS    HITS_algo = new HITS(graph, reviews);
-        HITS_algo.runHITS(ITERATIONS);
-        HITS_algo.propagateSentiment();
+        HITS_algo.runHITSV2();
+        //HITS_algo.runHITS(20);
+        //HITS_algo.propagateSentiment();
 
         SentimentEvaluation evaHITS = new SentimentEvaluation(reviews);
         evaHITS.createEvaluationSME();

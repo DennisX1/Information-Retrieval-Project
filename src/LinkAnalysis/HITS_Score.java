@@ -8,6 +8,9 @@ public class HITS_Score {
     public HITS_Score() {
         score = 1.0;
     }
+    public HITS_Score(double rating) {
+        score = rating;
+    }
 
     public double getScore() {
         return score;
@@ -28,6 +31,6 @@ public class HITS_Score {
 
         @Override
     public String toString() {
-        return "HITS Scores  Auth: " + score;
+        return "HITS Score: " + score;
     }
 }
