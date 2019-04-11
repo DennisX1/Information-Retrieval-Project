@@ -8,22 +8,28 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * Class offering operations to remove stop words from a set of reviews
+ *
+ * @author Dennis
+ */
 public class StopWordRemovalUtils {
 
-
-
     private static StopWordRemovalUtils instance;
-
-
-
     private List<String> stopWordList;
     private Review[] reviews;
-
 
     private StopWordRemovalUtils() {
 
     }
 
+
+    /**
+     * Static method returning a "cleaned" list of reviews
+     * @param reviewString set of reviews
+     * @return set of reviews without stop words
+     */
     public static Review[] removeStopWords(Review[] reviewString) {
 
         if (StopWordRemovalUtils.instance == null) {
@@ -37,6 +43,10 @@ public class StopWordRemovalUtils {
 
     }
 
+    /**
+     * Method initializing the stopWordList
+     * @param reviewString set of reviews
+     */
     public void initializeStopWordList(Review[] reviewString) {
         stopWordList = new ArrayList<>();
 
@@ -53,6 +63,11 @@ public class StopWordRemovalUtils {
 
     }
 
+    /**
+     * Method to remove the stopwords + punctuation marks
+     * @param reviewString set of reviews
+     * @return "cleaned" reviews
+     */
     public Review[] remove(Review[] reviewString) {
 
         reviews = reviewString;
@@ -82,6 +97,7 @@ public class StopWordRemovalUtils {
     }
 
     public static StopWordRemovalUtils getInstance() {
+
         return instance;
     }
     public List<String> getStopWordList() {

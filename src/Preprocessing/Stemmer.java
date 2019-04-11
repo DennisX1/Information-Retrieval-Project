@@ -11,6 +11,7 @@ import java.util.StringTokenizer;
  * The Stemmer class transforms a word into its root form.  The input
  * word can be provided a character at time (by calling add()), or at once
  * by calling one of the various stem(something) methods.
+ * @author Dennis not originally from me, but adjusted to our purposes
  */
 
 public class Stemmer {
@@ -487,6 +488,11 @@ public class Stemmer {
     }
 
 
+    /**
+     * Static method to stem a given set of reviews
+     * @param reviews set of reviews
+     * @return set of stemmed reviews
+     */
     public static Review[] stemReviews(Review[] reviews) {
         Stemmer stemmer = new Stemmer();
 
