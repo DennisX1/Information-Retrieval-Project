@@ -4,7 +4,6 @@ import data.Review;
 import data.ReviewGraph;
 import io.MatrixUtils;
 
-import java.util.*;
 
 /**
  * Class to represent the HITS algorithm. It is a slight variation to the original implementation.
@@ -14,29 +13,36 @@ import java.util.*;
  * Update Matrix L <=> weighted Graph of reviews
  */
 public class HITS {
+    private ReviewGraph similarityGraph;
     private double[][] weightedGraph;
     private Review[] reviews;
     private int quantityReviews;
     private double[][] updateMatrix;
-    private Map<Integer, HITS_Score> scoreCollection;
+    //private Map<Integer, HITS_Score> scoreCollection;
      private boolean converged;
-    public static final double EPSILON = 0.000001;
-    public static final int MAX_ITERATIONS = 30;
-
+    //public static final double EPSILON = 0.000001;
+    //public static final int MAX_ITERATIONS = 30;
+    //private static final double INITLABEL = 0.4;
+    public static double EPSILON;
+     public static int MAX_ITERATIONS;
+    private static  double INIT_LABEL;
 
     /**
      * Constructor of the HITS Algorithm.
      *
      * @param graph   Review[] - Array of reviews that should be included
-     * @param reviews []
+     *
      */
-    public HITS(ReviewGraph graph, Review[] reviews) {
-        this.reviews = reviews;
-        quantityReviews = reviews.length;
-        weightedGraph = graph.getGraph(); //shallow Copy
-        scoreCollection = new HashMap<>();
+    public HITS(ReviewGraph graph, double delta, int iterationLimit, double initLabel) {
+        similarityGraph = graph;
+        quantityReviews = graph.getReviewQuantity();
+        reviews = graph.getIncludedReviews();
+        weightedGraph = graph.getGraph();           //shallow Copy
         converged = false;
-        updateMatrix = weightedGraph;
+        EPSILON= delta;
+        MAX_ITERATIONS = iterationLimit;
+        INIT_LABEL = initLabel;
+        updateMatrix = weightedGraph; // no transformation needed since it is an undirected graph
     }
 
     /**
@@ -46,27 +52,28 @@ public class HITS {
      */
     public void runHITSV2() {
 
-        //for all nodes with unknown labels init
-        for (int j = 0; j < quantityReviews; j++) { // for each node get score
-            if ( !reviews[j].isKnown()){ // node with unknown label
-                putScoreToCollection(reviews[j].getId(), 0.4);
-            }else {
-                putScoreToCollection(reviews[j].getId(), reviews[j].getNormalizedRating());
-            }
-        }
-        startPropagation();
+      startPropagation();
 
     }
     private void startPropagation(){
         double[] updatedScores = new double[quantityReviews];
         int iterations =1;
+        int test =0;
         while (!converged && iterations < MAX_ITERATIONS ) {
             System.out.println("Iteration: "+ iterations);
 
             double[] oldScoresVec = new double[quantityReviews];
             for (int j = 0; j < quantityReviews; j++) {                 // for each node get score
-                HITS_Score otherNodes = getScoreFromCollection(reviews[j].getId());
-                oldScoresVec[j] = otherNodes.getScore();
+                if (reviews[j].isKnown()){
+                    oldScoresVec[j] = reviews[j].getNormalizedRating();
+                }
+                else if (reviews[j].getPredictedRating() == 0.0){
+                    oldScoresVec[j] = INIT_LABEL;
+                    test++;
+                }
+                else {
+                    oldScoresVec[j] = reviews[j].getPredictedRating();
+                }
             }
             MatrixUtils.printVectorDouble(oldScoresVec);
             //Multiply and save in HitScores
@@ -83,14 +90,13 @@ public class HITS {
         writePredictions(updatedScores);
 
         System.out.println("Final HIT Scores:");
-        double[] oldScoresVec = new double[quantityReviews];
         for (int j = 0; j < quantityReviews; j++) {                 // for each node get score
-            HITS_Score otherNodes = getScoreFromCollection(reviews[j].getId());
-            oldScoresVec[j] = otherNodes.getScore();
+            if (reviews[j].isKnown()){
+                System.out.println(reviews[j].getNormalizedRating());
+            }
+            else {System.out.println( reviews[j].getPredictedRating());
+            }
         }
-        MatrixUtils.printVectorDouble(oldScoresVec);
-
-
     }
 
     private void writePredictions(double[] updatedScores) {
@@ -132,76 +138,20 @@ public class HITS {
      * @param scoreVecHITS double[] normalized, updated scores for all nodes
      */
     private void updateScoresAllNodes(double[] scoreVecHITS) {
-        double score;
         for (int i = 0; i < scoreVecHITS.length; i++) {
             if (!reviews[i].isKnown()){
-                HITS_Score cur = getScoreFromCollection(reviews[i].getId());
-                score = scoreVecHITS[i];
                 // convergence
-                if( Math.abs(cur.getScore()-score) < EPSILON){
+                if( Math.abs(reviews[i].getPredictedRating() -scoreVecHITS[i]) < EPSILON){
                     converged = true;
                 }
-                cur.updateScores(score);
+                reviews[i].setPredictedRating(scoreVecHITS[i]);
             }
         }
     }
-
-    /**
-     * Add new Score to scoreCollection -only for Nodes with an unknown label
-     * @return store in collection successful
-     */
-    private boolean putScoreToCollection(int k, double rating) {
-        HITS_Score node = scoreCollection.get(k);
-        if (node == null) { // not yet in collection
-                node = new HITS_Score(rating);
-                scoreCollection.put(k, node);
-                return true;
-        }
-        return false;
-    }
-
-    /**
-     * Method to obtain the HIT_Score object for a given reviewID.
-     *
-     * @param k int- ID of review
-     * @return HITS_Score - Score object belonging to the given reviewID
-     */
-    private HITS_Score getScoreFromCollection(int k) {
-        HITS_Score node = scoreCollection.get(k);
-        if (node == null) { // not yet in collection
-            node = new HITS_Score();
-            scoreCollection.put(k, node);
-        }
-        return node;
-    }
-
 
     private double[][] createUpdateMatrix(double[][] matrix1, double[][] matrix2) {
         return MatrixUtils.matrixMultiplicationSameSize(matrix1, matrix2);
     }
 
 
-    private static <K, V> void printMap(Map<K, V> map) {
-        for (Map.Entry<K, V> entry : map.entrySet()) {
-            System.out.println("Key : " + entry.getKey()
-                    + " Value : " + entry.getValue());
-        }
-    }
-
-
-
-    /**
-     * Method to find the position of a review within the matrix for a given ID.
-     *
-     * @param ID int - reviewID
-     * @return int - position of review in matrix
-     */
-    public int findPositionOfReview(int ID) {
-        for (int i = 0; i < quantityReviews; i++) {
-            if (reviews[i].getId() == ID) {
-                return i;
-            }
-        }
-        return -1;
-    }
 }

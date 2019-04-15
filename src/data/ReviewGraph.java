@@ -121,4 +121,13 @@ public class ReviewGraph {
     public Review[] getIncludedReviews() {
         return includedReviews;
     }
+
+    /**
+     * Method to obtain the number of reviews the graph contains.
+     *
+     * @return in - number of reviews the Graph contains
+     */
+    public int getReviewQuantity() {
+        return includedReviews.length;
+    }
 }

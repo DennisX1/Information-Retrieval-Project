@@ -24,7 +24,7 @@ public class HITSTest {
         private static double[][] transposedGraph;
 
         private static void  testHITS(){
-            HITS algoHITS = new HITS(testGraph,reviews);
+            HITS algoHITS = new HITS(testGraph, 20, 20, 10);
             // TODO test which one works correct
 
             final long timeStart = System.currentTimeMillis();
@@ -37,25 +37,7 @@ public class HITSTest {
         }
 
 
-        private static void testReviewGraph(){
 
-            reviews = new Review[LIMIT];
-            try {
-                reviews = readJSONLimit(LIMIT);
-                System.out.println(reviews.length);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            testGraph = new ReviewGraph(LIMIT);
-            testGraph.addALLReviewsRANDOM(reviews);
-
-
-            //System.out.println(testGraph.toString());
-
-
-        }
 
         public static void main(String[] args) {
             testReviewGraph();
