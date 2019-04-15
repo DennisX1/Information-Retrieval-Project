@@ -25,7 +25,7 @@ public class ReviewGraph {
         includedReviews = reviews;
         weightedGraph = new double[reviews.length][reviews.length];
         for (int i = 0; i < reviews.length; i++) {
-            for (int j = i + 1; j < reviews.length; j++) {
+            for (int j = i; j < reviews.length; j++) {
                 weightedGraph[i][j] = similarities[i][j];
             }
         }

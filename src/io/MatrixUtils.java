@@ -75,7 +75,9 @@ public class MatrixUtils {
             double sum = 0;
             for (int column = 0; column < matrix[0].length; column++) {
                 //System.out.println("[" + row + ", "+ column + "]:"+ weights[row][column]);
-                double weight =  weights[row][column] ;
+                double w =  weights[row][column] ;
+                double adj = matrix[row][column] ;
+                double scr=  vector[column] ;
                 sum += matrix[row][column] * (vector[column] * weights[row][column]);
             }
             updatedVec[row] = sum;

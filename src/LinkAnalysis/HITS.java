@@ -57,27 +57,15 @@ public class HITS {
     }
     private void startPropagation(){
         double[] updatedScores = new double[quantityReviews];
-        int iterations =1;
+        int iterations =0;
         int test =0;
         while (!converged && iterations < MAX_ITERATIONS ) {
             System.out.println("Iteration: "+ iterations);
 
-            double[] oldScoresVec = new double[quantityReviews];
-            for (int j = 0; j < quantityReviews; j++) {                 // for each node get score
-                if (reviews[j].isKnown()){
-                    oldScoresVec[j] = reviews[j].getNormalizedRating();
-                }
-                else if (reviews[j].getPredictedRating() == 0.0){
-                    oldScoresVec[j] = INIT_LABEL;
-                    test++;
-                }
-                else {
-                    oldScoresVec[j] = reviews[j].getPredictedRating();
-                }
-            }
-            MatrixUtils.printVectorDouble(oldScoresVec);
+            double[] oldScores = getOldScores();
+            MatrixUtils.printVectorDouble(oldScores);
             //Multiply and save in HitScores
-            updatedScores = MatrixUtils.multiplyMatrixVectorWeighted(updateMatrix, oldScoresVec, weightedGraph);
+            updatedScores = MatrixUtils.multiplyMatrixVectorWeighted(updateMatrix, oldScores, weightedGraph);
 
             // normalize
             updatedScores = normalizeScores(updatedScores);
@@ -88,7 +76,36 @@ public class HITS {
         }
 
         writePredictions(updatedScores);
+    }
 
+    private double[] getOldScores(){
+        double[] oldScoresVec = new double[quantityReviews];
+        for (int j = 0; j < quantityReviews; j++) {                 // for each node get score
+            if (reviews[j].isKnown()){
+                oldScoresVec[j] = reviews[j].getNormalizedRating();
+            }
+            else if (reviews[j].getPredictedRating() == 0.0){
+                oldScoresVec[j] = INIT_LABEL;
+            }
+            else {
+                oldScoresVec[j] = reviews[j].getPredictedRating();
+            }
+        }
+        return   oldScoresVec;
+    }
+    public double[] finalHITScores(){
+        double[] finalScores = new double[quantityReviews];
+        for (int j = 0; j < quantityReviews; j++) {
+            if (reviews[j].isKnown()){
+                finalScores[j] = reviews[j].getNormalizedRating();
+            } else {
+                finalScores[j] = reviews[j].getPredictedRating();
+            }
+        }
+        return finalScores;
+    }
+
+    public void printFinalScores (){
         System.out.println("Final HIT Scores:");
         for (int j = 0; j < quantityReviews; j++) {                 // for each node get score
             if (reviews[j].isKnown()){
@@ -98,7 +115,6 @@ public class HITS {
             }
         }
     }
-
     private void writePredictions(double[] updatedScores) {
         for (int j = 0; j < quantityReviews; j++) { // for each node get score
             if (!reviews[j].isKnown()){

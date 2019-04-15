@@ -39,6 +39,7 @@ public class SentimentPropagation_Main {
         /*** create Graph for nodes */
         ReviewGraph graph = new ReviewGraph(QUANTITY_REVIEWS);
         graph.addALLReviewsRANDOM(reviews);
+
         /// TODO add SIM Measure here from Dennis
         // ReviewGraph graph = new ReviewGraph(reviews, double[][] similarities)
 
@@ -59,6 +60,7 @@ public class SentimentPropagation_Main {
         /*** run HITS ALgo */
         HITS    HITS_algo = new HITS(graph,  EPSILON, MAX_ITERATIONS, INIT_LABEL);
         HITS_algo.runHITSV2();
+        double[] finalVec = HITS_algo.finalHITScores();
 
         SentimentEvaluation evaHITS = new SentimentEvaluation(reviews);
         evaHITS.createEvaluationSME();
