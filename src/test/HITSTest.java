@@ -29,10 +29,10 @@ public class HITSTest {
 
             final long timeStart = System.currentTimeMillis();
             //algoHITS.runHITS(new HITS_Scores().ITERATIONS, new HITS_Scores().THRESHOLD);
-            algoHITS.runHITS(20);
+           // algoHITS.runHITS(20);
             final long timeEnd = System.currentTimeMillis();
             System.out.println("RT : " + (timeEnd - timeStart) + " Seconds");
-            algoHITS.propagateSentiment();
+
 
         }
 

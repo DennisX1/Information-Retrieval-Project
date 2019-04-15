@@ -5,6 +5,14 @@ public class Review {
     private int id;
     private String text;
     private double realRating;
+    private double predictedRating;
+    private boolean isKnown;
+    private double normalizedRating;
+
+    public double getNormalizedRating() {
+        return normalizedRating;
+    }
+
 
     public double getPredictedRating() {
         return predictedRating;
@@ -14,14 +22,15 @@ public class Review {
         this.predictedRating = predictedRating;
     }
 
-    private double predictedRating;
-    private boolean isKnown;
+
 
     public Review(String text, double realRating, boolean isKnown) {
         this.text = text;
         this.id = runningNumber++;
         this.realRating = realRating;
         this.isKnown = isKnown;
+        this.normalizedRating = realRating/5;
+
     }
 
     public int getId() {

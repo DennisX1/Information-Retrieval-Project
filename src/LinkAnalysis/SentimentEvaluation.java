@@ -17,7 +17,7 @@ public class SentimentEvaluation {
         for (Review rev : allReviews) {
             if(!rev.isKnown()){
                 counter++;
-                sqrMeanError += Math.pow ((rev.getRealRating() - rev.getPredictedRating()), 2);
+                sqrMeanError += Math.pow ((rev.getNormalizedRating() - rev.getPredictedRating()), 2);
 
             }
         }
