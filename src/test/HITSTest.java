@@ -4,11 +4,7 @@ import LinkAnalysis.HITS;
 import data.Review;
 import data.ReviewGraph;
 import io.MatrixUtils;
-import io.UtilsJson;
 
-import java.io.IOException;
-
-import static io.UtilsJson.readJSONLimit;
 import static org.junit.Assert.assertEquals;
 
 public class HITSTest {
