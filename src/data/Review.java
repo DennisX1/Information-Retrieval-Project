@@ -52,6 +52,10 @@ public class Review {
         return text;
     }
 
+    public void setText(String text) {
+        this.text = text;
+
+    }
     public static void printReviews(Review[] reviews) {
         for (Review r : reviews) {
             System.out.println(r);
