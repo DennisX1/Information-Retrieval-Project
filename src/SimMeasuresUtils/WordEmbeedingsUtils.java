@@ -3,54 +3,54 @@ package SimMeasuresUtils;
 import Preprocessing.StopWordRemovalUtils;
 import data.Review;
 import io.UtilsJson;
+
 import java.io.*;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
 import static io.UtilsJson.getReviewsFromDataset;
 
 /**
- * Class offering operation to calculate
+ * Class offering operation to calculate the cosine similarity between reviews based on word embeddings
+ *
  * @author Dennis
  */
 
 public class WordEmbeedingsUtils {
-
 
     private HashMap<String, double[]> denseVectorForWords;
     private static WordEmbeedingsUtils instance;
     private HashMap<Integer, double[]> denseVectorForDocument;
     private double[][] cosineArray;
 
-    public static double[][] calculateSimWordEmbeedingsUtils(Review[] reviews, List<String> stopWordList) {
+    public static double[][] calculateSimWordEmbeedingsUtils(Review[] reviews) {
 
         if (instance == null) {
             instance = new WordEmbeedingsUtils();
-            instance.loadData(stopWordList);
+            instance.loadData();
         }
 
         instance.createDenseVectorForReview(reviews);
 
-
         return instance.calculateCosineSimForDense(reviews.length);
-
 
     }
 
     /**
      * Method to reduce the size of the original FastText file
      */
-    private void createFile() {
+    private void createFile(int threshold, String pathname) {
         int counter = 0;
         try (BufferedReader br = new BufferedReader(new FileReader("data/wiki-news-300d-1M.vec"))) {
-            File file = new File("data/DenseVector.txt");
+            File file = new File("data/" + pathname);
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(fileOutputStream));
             String line;
             br.readLine();
-            while ((line = br.readLine()) != null && counter <= 300000) {
+            while ((line = br.readLine()) != null && counter <= threshold) {
                 bufferedWriter.write(line);
                 bufferedWriter.newLine();
                 counter++;
@@ -63,14 +63,13 @@ public class WordEmbeedingsUtils {
     }
 
     /**
-     *
      * Method to load the dense vectors from the file
      * Each line of the file consists of a word followed by 300 double values
      * Method reads the file, split it into tokens, and store it into a HashMap<String,[]Double>
      *
-     * @param stopWordList list including stop words
+     *
      */
-    private void loadData(List<String> stopWordList) {
+    private void loadData() {
 
         denseVectorForWords = new HashMap<>();
         int tempCounter = 1;
@@ -82,7 +81,7 @@ public class WordEmbeedingsUtils {
                 String[] tokens = line.split("\\s");
                 String temp = tokens[0];
 
-                if (!stopWordList.contains(temp)) {
+
                     double[] vectorValues = new double[tokens.length - 1];
 
                     for (int i = 1; i < tokens.length; i++) {
@@ -93,7 +92,7 @@ public class WordEmbeedingsUtils {
 
                     denseVectorForWords.put(temp, vectorValues);
 
-                }
+
 
             }
         } catch (IOException e) {
@@ -103,10 +102,9 @@ public class WordEmbeedingsUtils {
     }
 
     /**
-     *
      * Method to create the averaged dense vector for each Review
-     * @param reviews array containing reviews
      *
+     * @param reviews array containing reviews
      */
     private void createDenseVectorForReview(Review[] reviews) {
 
@@ -118,7 +116,6 @@ public class WordEmbeedingsUtils {
             double[] averagedValues = new double[300];
             String review = reviews[i].getText();
             String[] tokenized = review.split("\\s");
-
 
 
             //iterate over words
@@ -150,8 +147,8 @@ public class WordEmbeedingsUtils {
 
 
     /**
-     *
      * Method to calculate the Cosine Similarity
+     *
      * @param reviewCount counter for the reviews, used to set the size of the cosineArray
      * @return double array representing cosine sim btw. each document
      */
@@ -211,20 +208,31 @@ public class WordEmbeedingsUtils {
     public static void main(String[] args) {
 
 //        WordEmbeedingsUtils wordEmbeedingsUtils = new WordEmbeedingsUtils();
-//        wordEmbeedingsUtils.createFile();
+//        wordEmbeedingsUtils.createFile(500, "DenseTest.txt");
 
-        try {
-            Review[] reviews = getReviewsFromDataset(100, 50, UtilsJson.Dataset.AMAZON_INSTANT_VIDEO);
-            Review[] clean = StopWordRemovalUtils.removeStopWords(reviews);
-            List<String> stopWordList = StopWordRemovalUtils.getInstance().getStopWordList();
-            WordEmbeedingsUtils.calculateSimWordEmbeedingsUtils(clean, stopWordList);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Review [] review = new Review[2];
+        review[0] = new Review("work story",5.0,true);
+        review[1] = new Review("police media",5.0,true);
+        Review [] clean = StopWordRemovalUtils.removeStopWords(review);
+        List<String> stopWordList = StopWordRemovalUtils.getInstance().getStopWordList();
+        WordEmbeedingsUtils.calculateSimWordEmbeedingsUtils(clean);
+
+
+
+//        try {
+//            Review[] reviews = getReviewsFromDataset(100, 50, UtilsJson.Dataset.AMAZON_INSTANT_VIDEO);
+//            Review[] clean = StopWordRemovalUtils.removeStopWords(reviews);
+//            List<String> stopWordList = StopWordRemovalUtils.getInstance().getStopWordList();
+//            WordEmbeedingsUtils.calculateSimWordEmbeedingsUtils(clean, stopWordList);
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//
+//    }
 
 
     }
-
-
 }

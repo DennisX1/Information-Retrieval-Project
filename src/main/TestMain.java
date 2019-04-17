@@ -19,7 +19,7 @@ public class TestMain {
         String l = "Saturn is the Roman god of sowing";
         String [] testAray = {a,b,c};
         String [] testArray1 = {g,h,l};
-        TFIDFUtils.computeSimilaritiesTEST(testArray1);
+      //  TFIDFUtils.computeSimilaritiesTEST(testArray1);
     }
 
 }
