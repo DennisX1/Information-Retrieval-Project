@@ -2,6 +2,10 @@ package main;
 
 import LinkAnalysis.HITS;
 import LinkAnalysis.SentimentEvaluation;
+import Preprocessing.Stemmer;
+import Preprocessing.StopWordRemovalUtils;
+import SimMeasuresUtils.TFIDFUtils;
+import SimMeasuresUtils.WordEmbeedingsUtils;
 import data.Review;
 import data.ReviewGraph;
 import io.UtilsJson;
@@ -32,7 +36,18 @@ public class SentimentPropagration_Main {
 
         /*** create Graph for nodes */
         ReviewGraph graph = new ReviewGraph(QUANTITY_REVIEWS);
-        // TODO add SIM Measure here from Dennis
+
+
+        /*** Sim Measures */
+        /*** stop word removal */
+        Review cleaned [] = StopWordRemovalUtils.removeStopWords(reviews);
+        /*** Stemming */
+        Review stemmed [] = Stemmer.stemReviews(cleaned);
+        /*** TFIDF with stop word removal + stemming */
+        double [] [] tfIdfSims = TFIDFUtils.computeSimilarities(stemmed);
+        /*** WordEmbeddings with stop word removal */
+        double [] []  wordEmbeddingSims = WordEmbeedingsUtils.calculateSimWordEmbeedingsUtils(cleaned);
+
         graph.addALLReviewsRANDOM(reviews);
         //graph.addALLReviewsRANDOM(reviews, EXCLUSION_THRESHOLD);
         System.out.println(graph.toString());
