@@ -43,7 +43,7 @@ public class SentimentPropagation_Main {
         /// TODO add SIM Measure here from Dennis
         // ReviewGraph graph = new ReviewGraph(reviews, double[][] similarities)
 
-        System.out.println(graph.toString());
+        //System.out.println(graph.toString());
 
         /*** run PageRank Algo */
 
@@ -59,7 +59,7 @@ public class SentimentPropagation_Main {
 
         /*** run HITS ALgo */
         HITS    HITS_algo = new HITS(graph,  EPSILON, MAX_ITERATIONS, INIT_LABEL);
-        HITS_algo.runHITSV2();
+        HITS_algo.runHITS();
         double[] finalVec = HITS_algo.finalHITScores();
 
         SentimentEvaluation evaHITS = new SentimentEvaluation(reviews);

@@ -30,7 +30,6 @@ public class Review {
         this.realRating = realRating;
         this.isKnown = isKnown;
         this.normalizedRating = realRating/5;
-
     }
 
     public int getId() {

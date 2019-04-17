@@ -18,25 +18,20 @@ public class HITSTest {
 
     private static void testHITS() {
         HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL);
-
-        algoHITS.runHITSV2();
+        algoHITS.runHITS();
         double[] predictions = algoHITS.finalHITScores();
-        MatrixUtils.printVectorDouble(predictions);
+        //MatrixUtils.printVectorDouble(predictions);
 
-        assertEquals(0.2, predictions[0], 0.01);
-        assertEquals(1.0, predictions[1], 0.01);
-        assertEquals(0.186, predictions[2], 0.01);
-
+        assertEquals(1.0, predictions[0], 0.01);
+        assertEquals(5.0, predictions[1], 0.01);
+        assertEquals(2.7, predictions[2], 0.01);
     }
 
     private static void testRTHITS() {
         QUANTITY_REVIEWS = 1000;
-
-
         HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL);
-
         final long timeStart = System.currentTimeMillis();
-        algoHITS.runHITSV2();
+        algoHITS.runHITS();
         final long timeEnd = System.currentTimeMillis();
         System.out.println("RT : " + (timeEnd - timeStart) + " Seconds");
 
@@ -45,6 +40,7 @@ public class HITSTest {
 
 
     public static void main(String[] args) {
+        //______________________PREPARATIONS__________
         Review[] reviews = new Review[QUANTITY_REVIEWS];
         reviews[0] = new Review("a", 1.0, true);
         reviews[1] = new Review("ab", 5.0, true);
@@ -56,7 +52,7 @@ public class HITSTest {
 
         testGraph = new ReviewGraph(reviews, testSimilarities);
 
-
+        //______________________TESTS__________
         testHITS();
         //testRTHITS();
     }

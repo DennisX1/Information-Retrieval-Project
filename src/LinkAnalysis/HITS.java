@@ -17,21 +17,16 @@ public class HITS {
     private double[][] weightedGraph;
     private Review[] reviews;
     private int quantityReviews;
-    private double[][] updateMatrix;
-    //private Map<Integer, HITS_Score> scoreCollection;
-     private boolean converged;
-    //public static final double EPSILON = 0.000001;
-    //public static final int MAX_ITERATIONS = 30;
-    //private static final double INITLABEL = 0.4;
-    public static double EPSILON;
-     public static int MAX_ITERATIONS;
-    private static  double INIT_LABEL;
+    private double[][] adjacencyMatrix;
+    private boolean converged;
+    private static double EPSILON;
+    private static int MAX_ITERATIONS;
+    private static double INIT_LABEL;
 
     /**
      * Constructor of the HITS Algorithm.
      *
-     * @param graph   Review[] - Array of reviews that should be included
-     *
+     * @param graph Review[] - Array of reviews that should be included
      */
     public HITS(ReviewGraph graph, double delta, int iterationLimit, double initLabel) {
         similarityGraph = graph;
@@ -39,65 +34,92 @@ public class HITS {
         reviews = graph.getIncludedReviews();
         weightedGraph = graph.getGraph();           //shallow Copy
         converged = false;
-        EPSILON= delta;
+        EPSILON = delta;
         MAX_ITERATIONS = iterationLimit;
         INIT_LABEL = initLabel;
-        updateMatrix = weightedGraph; // no transformation needed since it is an undirected graph
+        // no transformation needed since it is an undirected graph
+        adjacencyMatrix = generateUpdateMatrix(weightedGraph);
+    }
+
+    /**
+     * Method to create the adjacency matrix, where each self-edge (i=J) = 0.
+     * Diagonal of the matrix is filled with zeros.
+     * Required for the update calculation.
+     *
+     * @param weightedGraph double[][] weighted Graph containing all similarity measures
+     * @return double[][] adjacency matrix  a diagonal filled with zeros.
+     */
+    private double[][] generateUpdateMatrix(double[][] weightedGraph) {
+        double[][] adjustedGraph = new double[weightedGraph.length][weightedGraph.length];
+        for (int i = 0; i < weightedGraph.length; i++) {
+            for (int j = 0; j < weightedGraph[i].length; j++) {
+                adjustedGraph[i][j] = weightedGraph[i][j];
+                if (i == j) {
+                    adjustedGraph[i][j] = 0;
+                }
+            }
+        }
+        return adjustedGraph;
     }
 
     /**
      * Method the trigger the HITS Algorithm.
-     *
-     *
      */
-    public void runHITSV2() {
-
-      startPropagation();
-
-    }
-    private void startPropagation(){
+    public void runHITS() {
+        /***startPropagation */
         double[] updatedScores = new double[quantityReviews];
-        int iterations =0;
-        int test =0;
-        while (!converged && iterations < MAX_ITERATIONS ) {
-            System.out.println("Iteration: "+ iterations);
+        int iterations = 0;
+        int test = 0;
+        while (!converged && iterations < MAX_ITERATIONS) {
+            //System.out.println("Iteration: " + iterations);
 
             double[] oldScores = getOldScores();
-            MatrixUtils.printVectorDouble(oldScores);
+            //MatrixUtils.printVectorDouble(oldScores);
             //Multiply and save in HitScores
-            updatedScores = MatrixUtils.multiplyMatrixVectorWeighted(updateMatrix, oldScores, weightedGraph);
+            updatedScores = MatrixUtils.multiplyMatrixVector(adjacencyMatrix, oldScores);
 
-            // normalize
+            // normalize Scores
             updatedScores = normalizeScores(updatedScores);
-            MatrixUtils.printVectorDouble(updatedScores);
+            //MatrixUtils.printVectorDouble(updatedScores);
+
             // Update
             updateScoresAllNodes(updatedScores);
             iterations++;
         }
-
+        /*** write Predication after denormalizing*/
         writePredictions(updatedScores);
     }
 
-    private double[] getOldScores(){
+    /**
+     * Method to obtain the HITS scores of the previous run and return it in a
+     * form of a vector /array.
+     *
+     * @return double[] - containing the previous HITS scores
+     */
+    private double[] getOldScores() {
         double[] oldScoresVec = new double[quantityReviews];
         for (int j = 0; j < quantityReviews; j++) {                 // for each node get score
-            if (reviews[j].isKnown()){
+            if (reviews[j].isKnown()) {
                 oldScoresVec[j] = reviews[j].getNormalizedRating();
-            }
-            else if (reviews[j].getPredictedRating() == 0.0){
+            } else if (reviews[j].getPredictedRating() == 0.0) {
                 oldScoresVec[j] = INIT_LABEL;
-            }
-            else {
+            } else {
                 oldScoresVec[j] = reviews[j].getPredictedRating();
             }
         }
-        return   oldScoresVec;
+        return oldScoresVec;
     }
-    public double[] finalHITScores(){
+
+    /**
+     * Method to obtain the final scores the HITS algo calculated.
+     *
+     * @return double[] containing the final HITS scores
+     */
+    public double[] finalHITScores() {
         double[] finalScores = new double[quantityReviews];
         for (int j = 0; j < quantityReviews; j++) {
-            if (reviews[j].isKnown()){
-                finalScores[j] = reviews[j].getNormalizedRating();
+            if (reviews[j].isKnown()) {
+                finalScores[j] = reviews[j].getRealRating();
             } else {
                 finalScores[j] = reviews[j].getPredictedRating();
             }
@@ -105,22 +127,37 @@ public class HITS {
         return finalScores;
     }
 
-    public void printFinalScores (){
+    /**
+     * Method to print out the final HITS Scores.
+     */
+    public void printFinalScores() {
         System.out.println("Final HIT Scores:");
-        for (int j = 0; j < quantityReviews; j++) {                 // for each node get score
-            if (reviews[j].isKnown()){
-                System.out.println(reviews[j].getNormalizedRating());
-            }
-            else {System.out.println( reviews[j].getPredictedRating());
+        for (int j = 0; j < quantityReviews; j++) {
+            if (reviews[j].isKnown()) {
+                System.out.println(reviews[j].getPredictedRating());
+            } else {
+                System.out.println(reviews[j].getPredictedRating());
             }
         }
     }
+
     private void writePredictions(double[] updatedScores) {
         for (int j = 0; j < quantityReviews; j++) { // for each node get score
-            if (!reviews[j].isKnown()){
-                reviews[j].setPredictedRating(updatedScores[j]);
+            if (!reviews[j].isKnown()) {
+                reviews[j].setPredictedRating(denormalizeHITSScore(updatedScores[j]));
             }
         }
+    }
+
+    /**
+     * Method to denormalize the calculated Scores. Assures that the
+     * Evaluation results of PageRank and HITS are comparable.
+     *
+     * @param normalizedScore double normalized HITS score
+     * @return double - denormalized HITS score
+     */
+    private double denormalizeHITSScore(double normalizedScore) {
+        return normalizedScore * 4 + 1;
     }
 
     /**
@@ -130,8 +167,8 @@ public class HITS {
      * @return normalized double[] array with scores
      */
     private double[] normalizeScores(double[] scoreVec) {
-        System.out.println("Before normalization");
-        MatrixUtils.printVectorDouble(scoreVec);
+        //System.out.println("Before normalization");
+        //MatrixUtils.printVectorDouble(scoreVec);
         double sumScores = 0.0;
         for (int i = 0; i < scoreVec.length; i++) {
             sumScores += scoreVec[i];
@@ -155,19 +192,13 @@ public class HITS {
      */
     private void updateScoresAllNodes(double[] scoreVecHITS) {
         for (int i = 0; i < scoreVecHITS.length; i++) {
-            if (!reviews[i].isKnown()){
+            if (!reviews[i].isKnown()) {
                 // convergence
-                if( Math.abs(reviews[i].getPredictedRating() -scoreVecHITS[i]) < EPSILON){
+                if (Math.abs(reviews[i].getPredictedRating() - scoreVecHITS[i]) < EPSILON) {
                     converged = true;
                 }
                 reviews[i].setPredictedRating(scoreVecHITS[i]);
             }
         }
     }
-
-    private double[][] createUpdateMatrix(double[][] matrix1, double[][] matrix2) {
-        return MatrixUtils.matrixMultiplicationSameSize(matrix1, matrix2);
-    }
-
-
 }

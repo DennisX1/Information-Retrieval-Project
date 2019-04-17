@@ -17,15 +17,15 @@ public class SentimentEvaluation {
         for (Review rev : allReviews) {
             if(!rev.isKnown()){
                 counter++;
-                sqrMeanError += Math.pow ((rev.getNormalizedRating() - rev.getPredictedRating()), 2);
+                sqrMeanError += Math.pow ((rev.getRealRating() - rev.getPredictedRating()), 2);
 
             }
         }
          sqrMeanError= sqrMeanError/counter;
     }
 
-    public void printSME(String addiionalText){
-        System.out.println(addiionalText + "Squared Mean Error is: " + sqrMeanError);
+    public void printSME(String additionalText){
+        System.out.println(additionalText + "Squared Mean Error is: " + sqrMeanError);
     }
 
 
