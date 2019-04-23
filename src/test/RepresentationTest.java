@@ -1,9 +1,12 @@
 package test;
 
+import Preprocessing.Stemmer;
 import Preprocessing.StopWordRemovalUtils;
+import SimMeasuresUtils.TFIDFUtils;
 import SimMeasuresUtils.WordEmbeedingsUtils;
 import data.Review;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 
@@ -11,9 +14,26 @@ public class RepresentationTest {
     private static Review[] originalRev = new Review[3];
 
     @Test
-    public void testTFIDFRepresentations() {
-        originalRev[0] = new Review("I love this book so much. It is a good book to read.", 5.0, true);
-        // TODO DENNIS
+    public static void testTFIDFRepresentations() {
+        Review[] orginalReview = new Review[3];
+        orginalReview[0] = new Review("Saturn is the gas planet with rings.", 5.0, true);
+        orginalReview[1] = new Review("Jupiter is the largest gas planet.", 5.0, true);
+        orginalReview[2] = new Review("Saturn is the Roman god of sowing", 5.0, true);
+
+        Review[] cleaned = StopWordRemovalUtils.removeStopWords(orginalReview);
+        Review[] stemmed = Stemmer.stemReviews(cleaned);
+
+        double[][] cosine = TFIDFUtils.computeSimilarities(stemmed);
+
+        assertEquals(0.1523, cosine[0][1], 0);
+        assertEquals(0.1523, cosine[1][0], 0);
+        assertEquals(0.0648, cosine[0][2], 0);
+        assertEquals(0.0648, cosine[2][0], 0);
+        assertEquals(0, cosine[1][2], 0);
+        assertEquals(0, cosine[2][1], 0);
+        assertEquals(1, cosine[0][0], 0);
+        assertEquals(1, cosine[1][1], 0);
+        assertEquals(1, cosine[2][2], 0);
 
     }
 
@@ -59,6 +79,7 @@ public class RepresentationTest {
     public static void main(String[] args) {
         testStopWordRemoval();
         testDenseRepresentations();
+        testTFIDFRepresentations();
     }
 }
 

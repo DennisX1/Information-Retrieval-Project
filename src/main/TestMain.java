@@ -1,6 +1,9 @@
 package main;
 
+import Preprocessing.Stemmer;
+import Preprocessing.StopWordRemovalUtils;
 import SimMeasuresUtils.TFIDFUtils;
+import data.Review;
 
 public class TestMain {
 
@@ -19,7 +22,15 @@ public class TestMain {
         String l = "Saturn is the Roman god of sowing";
         String [] testAray = {a,b,c};
         String [] testArray1 = {g,h,l};
-      //  TFIDFUtils.computeSimilaritiesTEST(testArray1);
+
+        Review[] orginalReview = new Review[3];
+        orginalReview[0] =  new Review("Saturn is the gas planet with rings.",5.0,true);
+        orginalReview[1] = new Review("Jupiter is the largest gas planet.",5.0,true);
+        orginalReview[2] = new Review ("Saturn is the Roman god of sowing",5.0,true);
+
+        Review [] cleaned = StopWordRemovalUtils.removeStopWords(orginalReview);
+        Review [] stemmed = Stemmer.stemReviews(cleaned);
+       TFIDFUtils.computeSimilarities(stemmed);
     }
 
 }
