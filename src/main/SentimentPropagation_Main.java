@@ -6,18 +6,24 @@ import data.Review;
 import data.ReviewGraph;
 import io.UtilsJson;
 
-public class SentimentPropagration_Main {
-    private static final int QUANTITY_REVIEWS= 2000;
-    private static final int PERCENTAGE_KNOWNLABELS = 50;
-    private static final int ITERATIONS= 10;
-    private static final double EXCLUSION_THRESHOLD = 0.000000002;
+/**
+ * Class containing the main method for the project for Sentiment Propagation with Link Analysis.
+ */
+public class SentimentPropagation_Main {
+    private static final int QUANTITY_REVIEWS= 10;
+    private static final int PERCENTAGE_KNOWN_LABELS = 50;
+    private static final double EPSILON = 0.000001;
+    private static final int MAX_ITERATIONS = 30;
+    private static final double INIT_LABEL = 0.4;
+
+
 
     public static void main(String[] args) {
         /*** get random dataset **/
         Review[] reviews = new Review[QUANTITY_REVIEWS];
         try {
             reviews = UtilsJson.getReviewsFromDataset(
-                    QUANTITY_REVIEWS, PERCENTAGE_KNOWNLABELS, UtilsJson.Dataset.AMAZON_INSTANT_VIDEO);
+                    QUANTITY_REVIEWS, PERCENTAGE_KNOWN_LABELS, UtilsJson.Dataset.AMAZON_INSTANT_VIDEO);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -32,10 +38,12 @@ public class SentimentPropagration_Main {
 
         /*** create Graph for nodes */
         ReviewGraph graph = new ReviewGraph(QUANTITY_REVIEWS);
-        // TODO add SIM Measure here from Dennis
         graph.addALLReviewsRANDOM(reviews);
-        //graph.addALLReviewsRANDOM(reviews, EXCLUSION_THRESHOLD);
-        System.out.println(graph.toString());
+
+        /// TODO add SIM Measure here from Dennis
+        // ReviewGraph graph = new ReviewGraph(reviews, double[][] similarities)
+
+        //System.out.println(graph.toString());
 
         /*** run PageRank Algo */
 
@@ -50,9 +58,9 @@ public class SentimentPropagration_Main {
 
 
         /*** run HITS ALgo */
-        HITS    HITS_algo = new HITS(graph, reviews);
-        HITS_algo.runHITS(ITERATIONS, EXCLUSION_THRESHOLD);
-        HITS_algo.propagateSentiment();
+        HITS    HITS_algo = new HITS(graph,  EPSILON, MAX_ITERATIONS, INIT_LABEL);
+        HITS_algo.runHITS();
+        double[] finalVec = HITS_algo.finalHITScores();
 
         SentimentEvaluation evaHITS = new SentimentEvaluation(reviews);
         evaHITS.createEvaluationSME();

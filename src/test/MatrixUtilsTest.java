@@ -1,27 +1,14 @@
 package test;
 
 import io.MatrixUtils;
-import io.UtilsJson;
 import org.junit.Test;
-
-import java.util.Random;
 
 import static org.junit.Assert.*;
 
-public class UtilsJsonTest {
+public class MatrixUtilsTest {
 
     @Test
-    public void failTest() {
-        // fail();
-    }
-
-    @Test
-    public void successTest() {
-        assertEquals(1, 1);
-    }
-
-    @Test
-    public void matrixMultTest() {
+    public void matrixMultSameSize() {
         double[][] a = new double[3][3];
         double[][] b = new double[3][3];
         a[0][0] = 1;
@@ -48,7 +35,7 @@ public class UtilsJsonTest {
         // (2 3 5) * (3 1 2) = (53 11 55)
         // (0 7 4)   (8 0 9)   (53 7  50)
 
-        double[][] c = UtilsJson.matrixMult(a, b);
+        double[][] c = MatrixUtils.matrixMultiplicationSameSize(a, b);
         assertEquals(62, c[0][0], 0.01);
         assertEquals(8, c[1][0], 0.01);
         assertEquals(64, c[2][0], 0.01);
@@ -59,11 +46,8 @@ public class UtilsJsonTest {
         assertEquals(7, c[1][2], 0.01);
         assertEquals(50, c[2][2], 0.01);
     }
-
-
-
     @Test
-    public void vectorMatrixMult() {
+    public void multiplyMatrixVectorTest() {
         double[] a = new double[3];
         double[][] b = new double[2][3];
         a[0] = 1;
@@ -77,9 +61,8 @@ public class UtilsJsonTest {
         b[0][2] = 5;
         b[1][2] = 6;
 
-        double[] c = UtilsJson.vectorMatrixMult(a, b);
+        double[] c = MatrixUtils.multiplyMatrixVector(b, a);
         assertEquals(32, c[0], 0.001);
         assertEquals(40, c[1], 0.001);
     }
-
 }

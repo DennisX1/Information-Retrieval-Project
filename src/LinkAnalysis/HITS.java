@@ -4,100 +4,171 @@ import data.Review;
 import data.ReviewGraph;
 import io.MatrixUtils;
 
-import java.util.*;
 
+/**
+ * Class to represent the HITS algorithm. It is a slight variation to the original implementation.
+ * Assumptions: HubScore = AuthScore  => therefore, we introduce HITS_Score as the only score
+ * Update Matrix L*L^T = L^T*L
+ * Updating rule: score^k = L * score^(k-1)
+ * Update Matrix L <=> weighted Graph of reviews
+ */
 public class HITS {
+    private ReviewGraph similarityGraph;
     private double[][] weightedGraph;
     private Review[] reviews;
     private int quantityReviews;
-    private double[][] updateAuthMatrix;
-    private double[][] updateHubMatrix;
-    private Map<Integer, HITS_Scores> scoreCollection;
-    private int topK = 200;
-    private int[] topKReviewIDs;
+    private double[][] adjacencyMatrix;
+    private boolean converged;
+    private static double EPSILON;
+    private static int MAX_ITERATIONS;
+    private static double INIT_LABEL;
 
-
-    public HITS(ReviewGraph graph, Review[] reviews) {
-        System.out.println("CHECK if always symmetric and than reduce calculations and sizes");
-        this.reviews = reviews;
-        quantityReviews = reviews.length;
-        topKReviewIDs = new int[topK];
-        weightedGraph = graph.getGraph();
-        scoreCollection = new HashMap<>();
-        /** Regular approach  ***/
-        /*
-        double[][] transposedGraph = MatrixUtils.transposeMatrix(graph.getGraph());
-        //MatrixUtils.printMatrixDouble(graph.getGraph(), "Initial Graph");
-        //MatrixUtils.printMatrixDouble(transposedGraph, "Transposed Graph");
-
-        updateAuthMatrix = createUpdateMatrix(graph.getGraph(), transposedGraph);
-        //MatrixUtils.printMatrixDouble(updateAuthMatrix, "L^T*L");
-        updateHubMatrix = createUpdateMatrix(transposedGraph, graph.getGraph());
-        //MatrixUtils.printMatrixDouble(updateHubMatrix, "L*L^T");
-        //updateHubMatrix = MatrixUtils.transposeMatrix(updateAuthMatrix);
-        //MatrixUtils.printMatrixDouble(updateHubMatrix, "L*L^T V2");*/
-
-        /******** making use of undirected arcs **********/
-        updateAuthMatrix = weightedGraph;
-        updateHubMatrix = weightedGraph;
+    /**
+     * Constructor of the HITS Algorithm.
+     *
+     * @param graph Review[] - Array of reviews that should be included
+     */
+    public HITS(ReviewGraph graph, double delta, int iterationLimit, double initLabel) {
+        similarityGraph = graph;
+        quantityReviews = graph.getReviewQuantity();
+        reviews = graph.getIncludedReviews();
+        weightedGraph = graph.getGraph();           //shallow Copy
+        converged = false;
+        EPSILON = delta;
+        MAX_ITERATIONS = iterationLimit;
+        INIT_LABEL = initLabel;
+        // no transformation needed since it is an undirected graph
+        adjacencyMatrix = generateUpdateMatrix(weightedGraph);
     }
 
-    private void resetMatrices() {
-        double[][] transposedGraph = MatrixUtils.transposeMatrix(weightedGraph);
-        //MatrixUtils.printMatrixDouble(weightedGraph, "Initial Graph");
-        //MatrixUtils.printMatrixDouble(transposedGraph, "Transposed Graph");
-
-        updateAuthMatrix = createUpdateMatrix(weightedGraph, transposedGraph);
-        //MatrixUtils.printMatrixDouble(updateAuthMatrix, "L^T*L");
-        updateHubMatrix = createUpdateMatrix(transposedGraph, weightedGraph);
-        //MatrixUtils.printMatrixDouble(updateHubMatrix, "L*L^T");
-        //updateHubMatrix = MatrixUtils.transposeMatrix(updateAuthMatrix);
-        //MatrixUtils.printMatrixDouble(updateHubMatrix, "L*L^T V2");
-        scoreCollection.clear();
-
-    }
-
-    private void resetMatricesNoTransposition() {
-        updateAuthMatrix = weightedGraph;
-        updateHubMatrix = weightedGraph;
-        scoreCollection.clear();
-    }
-
-    public void runHITS(int iterations, double exclusionThreshold) {
-        //double[] newHubsVec = new double[quantityReviews];
-        double[] scoreVecHITS = new double[quantityReviews];
-
-        for (int i = 0; i < iterations; i++) {
-
-            double[] vecY = new double[quantityReviews];
-            double[] vecX = new double[quantityReviews];
-
-            for (int j = 0; j < quantityReviews; j++) { // for each node get score
-
-                HITS_Scores otherNodes = getScoreFromCollection(reviews[j].getId());
-                //*** vecX[j] = otherNodes.getAuthorityScore();
-                vecY[j] = otherNodes.getHubScore();
+    /**
+     * Method to create the adjacency matrix, where each self-edge (i=J) = 0.
+     * Diagonal of the matrix is filled with zeros.
+     * Required for the update calculation.
+     *
+     * @param weightedGraph double[][] weighted Graph containing all similarity measures
+     * @return double[][] adjacency matrix  a diagonal filled with zeros.
+     */
+    private double[][] generateUpdateMatrix(double[][] weightedGraph) {
+        double[][] adjustedGraph = new double[weightedGraph.length][weightedGraph.length];
+        for (int i = 0; i < weightedGraph.length; i++) {
+            for (int j = 0; j < weightedGraph[i].length; j++) {
+                adjustedGraph[i][j] = weightedGraph[i][j];
+                if (i == j) {
+                    adjustedGraph[i][j] = 0;
+                }
             }
-
-            //Multiply and save in HitScores
-            scoreVecHITS = MatrixUtils.multiplyMatrixVectorWeighted(updateAuthMatrix, vecY, weightedGraph);
-            //*** newHubsVec = MatrixUtils.multiplyMatrixVectorWeighted(updateHubMatrix, vecX, weightedGraph);
-
-            // normalize
-            scoreVecHITS = normalizeScores(scoreVecHITS);
-            //*** newHubsVec = normalizeScores(newHubsVec);
-            updateScoresAllNodes(scoreVecHITS, exclusionThreshold);
-
-
         }
-
-        System.out.println("TEST   2:");
-        MatrixUtils.printVectorDouble(scoreVecHITS);
-
-        getTopKReviews();
+        return adjustedGraph;
     }
 
+    /**
+     * Method the trigger the HITS Algorithm.
+     */
+    public void runHITS() {
+        /***startPropagation */
+        double[] updatedScores = new double[quantityReviews];
+        int iterations = 0;
+        int test = 0;
+        while (!converged && iterations < MAX_ITERATIONS) {
+            //System.out.println("Iteration: " + iterations);
+
+            double[] oldScores = getOldScores();
+            //MatrixUtils.printVectorDouble(oldScores);
+            //Multiply and save in HitScores
+            updatedScores = MatrixUtils.multiplyMatrixVector(adjacencyMatrix, oldScores);
+
+            // normalize Scores
+            updatedScores = normalizeScores(updatedScores);
+            //MatrixUtils.printVectorDouble(updatedScores);
+
+            // Update
+            updateScoresAllNodes(updatedScores);
+            iterations++;
+        }
+        /*** write Predication after denormalizing*/
+        writePredictions(updatedScores);
+    }
+
+    /**
+     * Method to obtain the HITS scores of the previous run and return it in a
+     * form of a vector /array.
+     *
+     * @return double[] - containing the previous HITS scores
+     */
+    private double[] getOldScores() {
+        double[] oldScoresVec = new double[quantityReviews];
+        for (int j = 0; j < quantityReviews; j++) {                 // for each node get score
+            if (reviews[j].isKnown()) {
+                oldScoresVec[j] = reviews[j].getNormalizedRating();
+            } else if (reviews[j].getPredictedRating() == 0.0) {
+                oldScoresVec[j] = INIT_LABEL;
+            } else {
+                oldScoresVec[j] = reviews[j].getPredictedRating();
+            }
+        }
+        return oldScoresVec;
+    }
+
+    /**
+     * Method to obtain the final scores the HITS algo calculated.
+     *
+     * @return double[] containing the final HITS scores
+     */
+    public double[] finalHITScores() {
+        double[] finalScores = new double[quantityReviews];
+        for (int j = 0; j < quantityReviews; j++) {
+            if (reviews[j].isKnown()) {
+                finalScores[j] = reviews[j].getRealRating();
+            } else {
+                finalScores[j] = reviews[j].getPredictedRating();
+            }
+        }
+        return finalScores;
+    }
+
+    /**
+     * Method to print out the final HITS Scores.
+     */
+    public void printFinalScores() {
+        System.out.println("Final HIT Scores:");
+        for (int j = 0; j < quantityReviews; j++) {
+            if (reviews[j].isKnown()) {
+                System.out.println(reviews[j].getPredictedRating());
+            } else {
+                System.out.println(reviews[j].getPredictedRating());
+            }
+        }
+    }
+
+    private void writePredictions(double[] updatedScores) {
+        for (int j = 0; j < quantityReviews; j++) { // for each node get score
+            if (!reviews[j].isKnown()) {
+                reviews[j].setPredictedRating(denormalizeHITSScore(updatedScores[j]));
+            }
+        }
+    }
+
+    /**
+     * Method to denormalize the calculated Scores. Assures that the
+     * Evaluation results of PageRank and HITS are comparable.
+     *
+     * @param normalizedScore double normalized HITS score
+     * @return double - denormalized HITS score
+     */
+    private double denormalizeHITSScore(double normalizedScore) {
+        return normalizedScore * 4 + 1;
+    }
+
+    /**
+     * Method to normalize the calculated score.
+     *
+     * @param scoreVec double[] array containing the calculated scores
+     * @return normalized double[] array with scores
+     */
     private double[] normalizeScores(double[] scoreVec) {
+        //System.out.println("Before normalization");
+        //MatrixUtils.printVectorDouble(scoreVec);
         double sumScores = 0.0;
         for (int i = 0; i < scoreVec.length; i++) {
             sumScores += scoreVec[i];
@@ -114,104 +185,20 @@ public class HITS {
         return scoreVec;
     }
 
-
-    private void updateScoresAllNodes(double[] scoreVecHITS, double exclusionThreshold) {
-        double auth;
-        double hub;
+    /**
+     * Method to update the score for each node.
+     *
+     * @param scoreVecHITS double[] normalized, updated scores for all nodes
+     */
+    private void updateScoresAllNodes(double[] scoreVecHITS) {
         for (int i = 0; i < scoreVecHITS.length; i++) {
-            HITS_Scores cur = getScoreFromCollection(reviews[i].getId());
-            auth = scoreVecHITS[i];
-            hub = 1.0;
-            if (auth < exclusionThreshold) {
-                auth = 0.0;
-            }
-            //*** update hubs
-            if (hub < exclusionThreshold) {
-                hub = 0.0;
-            }
-            cur.updateScores(auth, hub);
-        }
-    }
-
-    private HITS_Scores getScoreFromCollection(int k) {
-        HITS_Scores node = scoreCollection.get(k);
-        if (node == null) { // not yet in collection
-            node = new HITS_Scores();
-            scoreCollection.put(k, node);
-        }
-        return node;
-    }
-
-    private double[][] createUpdateMatrix(double[][] matrix1, double[][] matrix2) {
-        return MatrixUtils.matrixMultiplicationSameSize(matrix1, matrix2);
-    }
-
-    public void propagateSentiment() {
-        for (int i = 0; i < quantityReviews; i++) {
             if (!reviews[i].isKnown()) {
-                calculateSentiment(reviews[i], i);
-            }
-
-        }
-    }
-
-    private void getTopKReviews() {
-        //printMap(scoreCollection);
-        List<Map.Entry<Integer, HITS_Scores>> list = new ArrayList<>(scoreCollection.entrySet());
-
-        /*Collections.sort(list, new Comparator<Map.Entry<Integer, HITS_Scores>>() {
-            public int compare(Map.Entry< Integer, HITS_Scores> o1,
-                               Map.Entry< Integer, HITS_Scores> o2) {
-                return o2.getValue().compareTo(o1.getValue());
-            }
-        });*/
-        Collections.sort(list, (o1, o2) -> o2.getValue().compareTo(o1.getValue()));
-        int k = 0;
-        for (Map.Entry<Integer, HITS_Scores> entry : list) {
-            if (k < topK) {
-                if (reviews[findPositionOfReview(entry.getKey())].isKnown()) {
-                    continue;
+                // convergence
+                if (Math.abs(reviews[i].getPredictedRating() - scoreVecHITS[i]) < EPSILON) {
+                    converged = true;
                 }
-                topKReviewIDs[k] = entry.getKey();
-                k++;
-
-            } else {
-                break;
+                reviews[i].setPredictedRating(scoreVecHITS[i]);
             }
         }
-    }
-
-
-    private static <K, V> void printMap(Map<K, V> map) {
-        for (Map.Entry<K, V> entry : map.entrySet()) {
-            System.out.println("Key : " + entry.getKey()
-                    + " Value : " + entry.getValue());
-        }
-    }
-
-    private void calculateSentiment(Review rev, int positionGraph) {
-        double sentiment = 0.0;
-        //idea = weight * label over all top K nodes avg by number of nodes
-        // SIGMA sim measure * label) /k
-        // for which review?
-        int row = positionGraph;
-        int column;
-        for (int i = 0; i < topK; i++) {
-            column = findPositionOfReview(topKReviewIDs[i]);
-            // it this ith  topK Review Label know? add it up
-            if ((reviews[column]).isKnown()) {
-                sentiment += weightedGraph[row][column] * reviews[i].getRealRating();
-            }
-        }
-        rev.setPredictedRating(sentiment);
-    }
-
-    public int findPositionOfReview(int ID) {
-        for (int i = 0; i < quantityReviews; i++) {
-            if (reviews[i].getId() == ID) {
-                return i;
-            }
-        }
-        return -1;
     }
 }
