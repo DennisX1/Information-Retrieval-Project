@@ -56,7 +56,6 @@ public class SentimentPropagation_Main {
 
         graph.addALLReviewsRANDOM(reviews);
 
-        /// TODO add SIM Measure here from Dennis
         // ReviewGraph graph = new ReviewGraph(reviews, double[][] similarities)
 
         //System.out.println(graph.toString());
