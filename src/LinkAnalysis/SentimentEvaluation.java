@@ -24,8 +24,8 @@ public class SentimentEvaluation {
          sqrMeanError= sqrMeanError/counter;
     }
 
-    public void printSME(String addiionalText){
-        System.out.println(addiionalText + "Squared Mean Error is: " + sqrMeanError);
+    public void printSME(String additionalText){
+        System.out.println(additionalText + "Squared Mean Error is: " + sqrMeanError);
     }
 
 

@@ -4,18 +4,27 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 /**
- * Class offering different matrix operations, as well as print operations.
+ * Class offering different matrix operations, as well as print options.
  *
  * @author N. Seemann
  */
 public class MatrixUtils {
 
+    /**
+     * Method to print out an 2-dim. array/matrix.
+     *
+     * @param matrix double[][]
+     */
     public static void printMatrixDouble(double[][] matrix) {
         System.out.println(matrixToString(matrix));
-
     }
 
-    public static void printVectorDouble(double[] vector){
+    /**
+     * Method to print out an 1-dim. array/vector.
+     *
+     * @param vector double[]
+     */
+    public static void printVectorDouble(double[] vector) {
         NumberFormat formatter = new DecimalFormat("#.########");
         StringBuilder print = new StringBuilder("Vector \n");
         for (int i = 0; i < vector.length; i++) {
@@ -31,23 +40,35 @@ public class MatrixUtils {
 
     }
 
+    /**
+     * Method to create a String for an 2-dim. array/matrix.
+     *
+     * @param matrix double[][]
+     * @return String that represents the 2-dim. array/matrix.
+     */
     public static String matrixToString(double[][] matrix) {
         NumberFormat formatter = new DecimalFormat("#.########");
         StringBuilder print = new StringBuilder();
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix.length; j++) { // i=j not good for printing
-                print.append(formatter.format(matrix[i][j] )+ "\t\t");
+                print.append(formatter.format(matrix[i][j]) + "\t\t");
             }
             print.append("\n");
         }
         return print.toString();
     }
 
-    public static double[][] transposeMatrix(double[][] weights) {
-        double[][] tmp = new double[weights.length][weights[1].length];
-        for (int i = 0; i < weights.length; i++) {
-            for (int j = 0; j < weights[i].length; j++) {
-                tmp[j][i] = weights[i][j];
+    /**
+     * Method to transpose a given Matrix.
+     *
+     * @param matrix double [][]  2-dim. array/matrix
+     * @return double[][] transposed 2-dim. array/matrix
+     */
+    public static double[][] transposeMatrix(double[][] matrix) {
+        double[][] tmp = new double[matrix.length][matrix[1].length];
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                tmp[j][i] = matrix[i][j];
             }
         }
         return tmp;
@@ -69,41 +90,29 @@ public class MatrixUtils {
         return null;
     }
 
-    public static double[] multiplyMatrixVectorWeighted(double[][] matrix, double[] vector,double[][] weights){
+
+    /*public static double[]  updateScoresHITS(double[][] adjacencyMatrix,  double[] scoreVector){
+        return multiplyMatrixVector(adjacencyMatrix, scoreVector);
+    }*/
+
+    /**
+     * Method to multiply a 2-dim. array/matrix with an 1-dim. array/vector
+     *
+     * @param matrix double[][] 2-dim. array/matrix
+     * @param vector double[] 1-dim. array/vector
+     * @return vector double[] 1-dim. array/vector
+     */
+    public static double[] multiplyMatrixVector(double[][] matrix, double[] vector) {
         double[] updatedVec = new double[matrix.length];
         for (int row = 0; row < matrix.length; row++) {
             double sum = 0;
             for (int column = 0; column < matrix[0].length; column++) {
-                //System.out.println("[" + row + ", "+ column + "]:"+ weights[row][column]);
-                double weight =  weights[row][column] ;
-                sum += matrix[row][column] * (vector[column] * weights[row][column]);
+                //double adjWeight = matrix[row][column];
+                //double scr = vector[column];
+                sum += matrix[row][column] * (vector[column]);
             }
             updatedVec[row] = sum;
         }
         return updatedVec;
-    }
-
-    public static double[] multiplyMatrixVector(double[][] matrix, double[] vector){
-        double[] updatedVec = new double[matrix.length];
-
-        for (int row = 0; row < matrix.length; row++) {
-            double sum = 0;
-            for (int column = 0; column < matrix[0].length; column++) {
-                sum += matrix[row][column] * vector[column];
-            }
-            updatedVec[row] = sum;
-        }
-        //MatrixUtils.printVectorDouble(updatedVec);
-        return updatedVec;
-    }
-
-    public static double[][] transpMatrix(double[][] matrix) {
-        double[][] transp = new double[matrix[0].length][matrix.length];
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[0].length; j++) {
-                transp[j][i] = matrix[i][j];
-            }
-        }
-        return transp;
     }
 }
