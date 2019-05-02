@@ -8,22 +8,29 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * Class offering operations to remove stop words from a set of reviews
+ *
+ * @author Dennis
+ */
 public class StopWordRemovalUtils {
 
-
-
     private static StopWordRemovalUtils instance;
-
-
-
     private List<String> stopWordList;
     private Review[] reviews;
-
 
     private StopWordRemovalUtils() {
 
     }
 
+
+    /**
+     * Static method returning a "cleaned" list of reviews
+     *
+     * @param reviewString set of reviews
+     * @return set of reviews without stop words
+     */
     public static Review[] removeStopWords(Review[] reviewString) {
 
         if (StopWordRemovalUtils.instance == null) {
@@ -37,6 +44,11 @@ public class StopWordRemovalUtils {
 
     }
 
+    /**
+     * Method initializing the stopWordList
+     *
+     * @param reviewString set of reviews
+     */
     public void initializeStopWordList(Review[] reviewString) {
         stopWordList = new ArrayList<>();
 
@@ -53,27 +65,30 @@ public class StopWordRemovalUtils {
 
     }
 
+    /**
+     * Method to remove the stopwords + punctuation marks
+     *
+     * @param reviewString set of reviews
+     * @return "cleaned" reviews
+     */
     public Review[] remove(Review[] reviewString) {
 
         reviews = reviewString;
 
         for (int i = 0; i < reviews.length; i++) {
             String temp = reviews[i].getText().toLowerCase();
-          //  System.out.println("ALT  :" + temp);
+            //  System.out.println("ALT  :" + temp);
             for (int j = 0; j < stopWordList.size(); j++) {
                 if (temp.contains(stopWordList.get(j))) {
                     String regex = "\\s*\\b" + stopWordList.get(j) + "\\b\\s*";
                     temp = temp.replaceAll(regex, " ");
-
-
                 }
             }
             temp = temp.replaceAll("\\W+|\\s+", " ");
-
-
+            temp = temp.trim();
             reviewString[i].setText(temp);
 
-       //     System.out.println("NEU  :" + reviews[i].getText());
+            //     System.out.println("NEU  :" + reviews[i].getText());
 
         }
         return reviews;
@@ -82,8 +97,11 @@ public class StopWordRemovalUtils {
     }
 
     public static StopWordRemovalUtils getInstance() {
+
+
         return instance;
     }
+
     public List<String> getStopWordList() {
         return stopWordList;
     }

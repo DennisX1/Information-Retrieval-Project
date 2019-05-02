@@ -7,6 +7,12 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * Class offering operation to calculate the cosine simarility
+ * between documents based on TF-IDF values
+ * @author Dennis
+ */
+
 public class TFIDFUtils {
 
 
@@ -15,6 +21,12 @@ public class TFIDFUtils {
     private HashMap<String, Double> idfValuesForTermMap;
     private int amountOfDocuments;
 
+    /**
+     * Static method to get back the cosine similarity btw a set of reviews
+     * based on TF-IDF values
+     * @param reviews set of reviews
+     * @return double array that represent the cosine sim. btw. each document
+     */
     public static double[][] computeSimilarities(Review[] reviews) {
 
 
@@ -22,14 +34,21 @@ public class TFIDFUtils {
         return tfidfUtils.calculate(reviews);
     }
 
-    public static double[][] computeSimilaritiesTEST(String[] reviews) {
+//    public static double[][] computeSimilaritiesTEST(String[] reviews) {
+//
+//
+//        TFIDFUtils tfidfUtils = new TFIDFUtils();
+//        return tfidfUtils.calculateTesting(reviews);
+//    }
 
 
-        TFIDFUtils tfidfUtils = new TFIDFUtils();
-        return tfidfUtils.calculateTesting(reviews);
-    }
-
-
+    /**
+     *
+     * Method that combines the necessary steps to calculate the cosine sim
+     * between documents based on TF-IDF values
+     * @param reviews Array representing the reviews
+     * @return double array that represent the cosine sim. btw. each document
+     */
     private double[][] calculate(Review[] reviews) {
 
         int maxValueDocCounter = 0;
@@ -80,6 +99,12 @@ public class TFIDFUtils {
 
     }
 
+    /**
+     * Method to calculate the TF values
+     * @param documentindex represent the actual index of the review array that is currently processed
+     * @param maxValueDocCounter value that represents the most frequent word in the review
+     * @param wordsAndCounts HashMap<String,Long> represents the frequency of each word in the review
+     */
 
     private void calculateTFValues(int documentindex, int maxValueDocCounter, Map<String, Long> wordsAndCounts) {
 
@@ -97,6 +122,9 @@ public class TFIDFUtils {
 
     }
 
+    /**
+     * Method to calculate the IDF values
+     */
     private void calculateIDFValues() {
 
         for (Map.Entry<String, Integer> entry : termDocumentCountMap.entrySet()) {
@@ -107,6 +135,12 @@ public class TFIDFUtils {
 
     }
 
+
+    /**
+     * Method to calculate the cosine similarity btw. each document
+     * @param arraysize number of reviews to set the size of the cosineArray
+     * @return double array that represent the cosine sim. btw. each document
+     */
     private double[][] calculateCosineSim(int arraysize) {
 
         DecimalFormat df = new DecimalFormat("#.####");
@@ -179,55 +213,55 @@ public class TFIDFUtils {
     }
 
 
-    private double[][] calculateTesting(String[] reviews) {
-
-        int maxValueDocCounter = 0;
-        int documentIndex = 0;
-        tfValuesForDocumentsMap = new HashMap[reviews.length];
-        for (int i = 0; i < reviews.length; i++) {
-            tfValuesForDocumentsMap[i] = new HashMap<>();
-        }
-        termDocumentCountMap = new HashMap<>();
-        idfValuesForTermMap = new HashMap<>();
-        amountOfDocuments = reviews.length;
-
-        for (int i = 0; i < reviews.length; i++) {
-            //split string , count double words  Result  HashMap  "Term"--> Count
-            Map<String, Long> wordsAndCounts =
-                    Arrays.stream(reviews[i].split("\\s")).
-                            collect(Collectors.groupingBy(
-                                    Function.identity(),
-                                    Collectors.counting()
-                            ));        // show-->3 , read -->5 , listen -->10
-
-            for (Map.Entry<String, Long> entry : wordsAndCounts.entrySet()) {
-                if (entry.getValue() > maxValueDocCounter) {
-                    maxValueDocCounter = Math.toIntExact(entry.getValue());
-                }
-                if (termDocumentCountMap.containsKey(entry.getKey())) {
-
-                    termDocumentCountMap.put(entry.getKey(), termDocumentCountMap.get(entry.getKey()) + 1);
-                } else {
-                    termDocumentCountMap.put(entry.getKey(), 1);
-                }
-
-
-            }
-
-            calculateTFValues(documentIndex, maxValueDocCounter, wordsAndCounts);
-            maxValueDocCounter = 0;
-            documentIndex++;
-
-        }
-
-        calculateIDFValues();
-
-        System.out.println("IDF VALUES: " + idfValuesForTermMap);
-
-        return calculateCosineSim(reviews.length);
-
-
-    }
+//    private double[][] calculateTesting(String[] reviews) {
+//
+//        int maxValueDocCounter = 0;
+//        int documentIndex = 0;
+//        tfValuesForDocumentsMap = new HashMap[reviews.length];
+//        for (int i = 0; i < reviews.length; i++) {
+//            tfValuesForDocumentsMap[i] = new HashMap<>();
+//        }
+//        termDocumentCountMap = new HashMap<>();
+//        idfValuesForTermMap = new HashMap<>();
+//        amountOfDocuments = reviews.length;
+//
+//        for (int i = 0; i < reviews.length; i++) {
+//            //split string , count double words  Result  HashMap  "Term"--> Count
+//            Map<String, Long> wordsAndCounts =
+//                    Arrays.stream(reviews[i].split("\\s")).
+//                            collect(Collectors.groupingBy(
+//                                    Function.identity(),
+//                                    Collectors.counting()
+//                            ));        // show-->3 , read -->5 , listen -->10
+//
+//            for (Map.Entry<String, Long> entry : wordsAndCounts.entrySet()) {
+//                if (entry.getValue() > maxValueDocCounter) {
+//                    maxValueDocCounter = Math.toIntExact(entry.getValue());
+//                }
+//                if (termDocumentCountMap.containsKey(entry.getKey())) {
+//
+//                    termDocumentCountMap.put(entry.getKey(), termDocumentCountMap.get(entry.getKey()) + 1);
+//                } else {
+//                    termDocumentCountMap.put(entry.getKey(), 1);
+//                }
+//
+//
+//            }
+//
+//            calculateTFValues(documentIndex, maxValueDocCounter, wordsAndCounts);
+//            maxValueDocCounter = 0;
+//            documentIndex++;
+//
+//        }
+//
+//        calculateIDFValues();
+//
+//        System.out.println("IDF VALUES: " + idfValuesForTermMap);
+//
+//        return calculateCosineSim(reviews.length);
+//
+//
+//    }
 
 
 }
