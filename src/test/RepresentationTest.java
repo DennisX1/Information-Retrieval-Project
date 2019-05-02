@@ -58,12 +58,12 @@ public class RepresentationTest {
     @Test
     public static void testDenseRepresentations() {
 
-        Review[] orginalReview = new Review[2];
-        orginalReview[0] = new Review("work story", 5.0, true);
-        orginalReview[1] = new Review("police media", 5.0, true);
+        Review[] originalReview = new Review[2];
+        originalReview[0] = new Review("work story", 5.0, true);
+        originalReview[1] = new Review("police media", 5.0, true);
 
 
-        Review[] cleaned = StopWordRemovalUtils.removeStopWords(orginalReview);
+        Review[] cleaned = StopWordRemovalUtils.removeStopWords(originalReview);
 
         double[][] denseRepresentation = WordEmbeedingsUtils.calculateSimWordEmbeedingsUtils(cleaned);
 
