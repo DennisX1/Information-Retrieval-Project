@@ -35,7 +35,7 @@ public class MatrixUtilsTest {
         // (2 3 5) * (3 1 2) = (53 11 55)
         // (0 7 4)   (8 0 9)   (53 7  50)
 
-        double[][] c = MatrixUtils.matrixMultiplicationSameSize(a, b);
+        double[][] c = MatrixUtils.matrixMultiplicationSameSize(b, a);
         assertEquals(62, c[0][0], 0.01);
         assertEquals(8, c[1][0], 0.01);
         assertEquals(64, c[2][0], 0.01);
