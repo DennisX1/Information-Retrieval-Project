@@ -5,7 +5,7 @@ import LinkAnalysis.SentimentEvaluation;
 import Preprocessing.Stemmer;
 import Preprocessing.StopWordRemovalUtils;
 import SimMeasuresUtils.TFIDFUtils;
-import SimMeasuresUtils.WordEmbeedingsUtils;
+import SimMeasuresUtils.WordEmbeddingsUtils;
 import data.Review;
 import data.ReviewGraph;
 import io.UtilsJson;
@@ -52,7 +52,7 @@ public class SentimentPropagation_Main {
         /*** TFIDF with stop word removal + stemming */
         double [] [] tfIdfSims = TFIDFUtils.computeSimilarities(stemmed);
         /*** WordEmbeddings with stop word removal */
-        double [] []  wordEmbeddingSims = WordEmbeedingsUtils.calculateSimWordEmbeedingsUtils(cleaned);
+        double [] []  wordEmbeddingSims = WordEmbeddingsUtils.calculateSimWordEmbeddingsUtils(cleaned);
 
         graph.addALLReviewsRANDOM(reviews);
 

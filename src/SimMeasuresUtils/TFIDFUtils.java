@@ -1,6 +1,7 @@
 package SimMeasuresUtils;
 
 import data.Review;
+
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.*;
@@ -8,8 +9,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Class offering operation to calculate the cosine simarility
+ * Class offering operation to calculate the cosine similarity
  * between documents based on TF-IDF values
+ *
  * @author Dennis
  */
 
@@ -24,6 +26,7 @@ public class TFIDFUtils {
     /**
      * Static method to get back the cosine similarity btw a set of reviews
      * based on TF-IDF values
+     *
      * @param reviews set of reviews
      * @return double array that represent the cosine sim. btw. each document
      */
@@ -43,9 +46,9 @@ public class TFIDFUtils {
 
 
     /**
-     *
      * Method that combines the necessary steps to calculate the cosine sim
      * between documents based on TF-IDF values
+     *
      * @param reviews Array representing the reviews
      * @return double array that represent the cosine sim. btw. each document
      */
@@ -92,8 +95,6 @@ public class TFIDFUtils {
 
         calculateIDFValues();
 
-        System.out.println(idfValuesForTermMap);
-
         return calculateCosineSim(reviews.length);
 
 
@@ -101,24 +102,22 @@ public class TFIDFUtils {
 
     /**
      * Method to calculate the TF values
-     * @param documentindex represent the actual index of the review array that is currently processed
+     *
+     * @param documentIndex      represent the actual index of the review array that is currently processed
      * @param maxValueDocCounter value that represents the most frequent word in the review
-     * @param wordsAndCounts HashMap<String,Long> represents the frequency of each word in the review
+     * @param wordsAndCounts     HashMap<String,Long> represents the frequency of each word in the review
      */
 
-    private void calculateTFValues(int documentindex, int maxValueDocCounter, Map<String, Long> wordsAndCounts) {
+    private void calculateTFValues(int documentIndex, int maxValueDocCounter, Map<String, Long> wordsAndCounts) {
 
         for (Map.Entry<String, Long> entry : wordsAndCounts.entrySet()) {
 
-            tfValuesForDocumentsMap[documentindex].put
+            tfValuesForDocumentsMap[documentIndex].put
                     (entry.getKey(),
                             ((1 + Math.log10((double) entry.getValue())) / (1 + Math.log10((double) maxValueDocCounter))));
 
 
         }
-        System.out.println("Doc: " + documentindex + "    " + tfValuesForDocumentsMap[documentindex]);
-        System.out.println("Doc length" + tfValuesForDocumentsMap[documentindex].size());
-
 
     }
 
@@ -130,25 +129,24 @@ public class TFIDFUtils {
         for (Map.Entry<String, Integer> entry : termDocumentCountMap.entrySet()) {
             idfValuesForTermMap.put(entry.getKey(), (Math.log10(amountOfDocuments / (double) entry.getValue())));
         }
-//        System.out.println( "IDF" +idfValuesForTermMap);
-//        System.out.println ("IDF END");
 
     }
 
 
     /**
      * Method to calculate the cosine similarity btw. each document
-     * @param arraysize number of reviews to set the size of the cosineArray
+     *
+     * @param arraySize number of reviews to set the size of the cosineArray
      * @return double array that represent the cosine sim. btw. each document
      */
-    private double[][] calculateCosineSim(int arraysize) {
+    private double[][] calculateCosineSim(int arraySize) {
 
         DecimalFormat df = new DecimalFormat("#.####");
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
         dfs.setDecimalSeparator('.');
         df.setDecimalFormatSymbols(dfs);
 
-        double[][] cosineArray = new double[arraysize][arraysize];
+        double[][] cosineArray = new double[arraySize][arraySize];
 
 
         for (int row = 0; row < cosineArray.length; row++) {
@@ -189,7 +187,6 @@ public class TFIDFUtils {
 
                     for (int k = 0; k < rowsList.size(); k++) {
                         numeratorCosine += (rowsList.get(k) * colsList.get(k));
-                        //   System.out.println(rowsList.get(k) + "  " + colsList.get(k));
 
                     }
                     if ((denominatorFirst != 0 && denominatorSecond != 0)) {
@@ -206,10 +203,7 @@ public class TFIDFUtils {
             }
         }
 
-
-        System.out.println(Arrays.deepToString(cosineArray).replace("], ", "]\n"));
         return cosineArray;
-
     }
 
 
