@@ -19,8 +19,27 @@ public class HITSTest {
     private static ReviewGraph testGraph;
 
     @Test
+    public void testHITSAdjacency() {
+        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL, false);
+
+        //AdjacencyMatrix
+
+        double[][] adjMatrix = algoHITS.getAdjacencyMatrix();
+        assertEquals(0.31, adjMatrix[0][0], 0.01);
+        assertEquals(0.42, adjMatrix[0][1], 0.01);
+        assertEquals(0.24, adjMatrix[0][2], 0.01);
+        assertEquals(0.32, adjMatrix[1][0], 0.01);
+        assertEquals(0.51, adjMatrix[1][1], 0.01);
+        assertEquals(0.07, adjMatrix[1][2], 0.01);
+        assertEquals(0.06, adjMatrix[2][0], 0.01);
+        assertEquals(0.12, adjMatrix[2][1], 0.01);
+        assertEquals(0.76, adjMatrix[2][2], 0.01);
+    }
+    @Test
     public void testHITS() {
-        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL);
+        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL, false);
+
+
         algoHITS.runHITS();
         double[] predictions = algoHITS.finalHITScores();
         //MatrixUtils.printVectorDouble(predictions);
@@ -31,9 +50,23 @@ public class HITSTest {
     }
 
     @Test
+    public void testHITSZNormalise() {
+        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL, true);
+
+
+        algoHITS.runHITS();
+        double[] predictions = algoHITS.finalHITScores();
+        //MatrixUtils.printVectorDouble(predictions);
+
+        assertEquals(1.0, predictions[0], 0.01);
+        assertEquals(5.0, predictions[1], 0.01);
+        assertEquals(1.0, predictions[2], 0.01);
+    }
+
+    @Test
     public void testRTHITS() {
         QUANTITY_REVIEWS = 1000;
-        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL);
+        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL, false);
         final long timeStart = System.currentTimeMillis();
         algoHITS.runHITS();
         final long timeEnd = System.currentTimeMillis();

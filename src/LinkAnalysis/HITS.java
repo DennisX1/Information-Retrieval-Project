@@ -4,6 +4,9 @@ import data.Review;
 import data.ReviewGraph;
 import io.MatrixUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * Class to represent the HITS algorithm. It is a slight variation to the original implementation.
@@ -14,31 +17,37 @@ import io.MatrixUtils;
  */
 public class HITS {
     private ReviewGraph similarityGraph;
-    private double[][] weightedGraph;
+    //private double[][] weightedGraph;
     private Review[] reviews;
     private int quantityReviews;
     private double[][] adjacencyMatrix;
     private boolean converged;
+    private boolean useZNormalization;
     private static double EPSILON;
     private static int MAX_ITERATIONS;
     private static double INIT_LABEL;
+    //private static Map<Integer, HITS_Score> scoreCollection;
 
     /**
      * Constructor of the HITS Algorithm.
      *
      * @param graph Review[] - Array of reviews that should be included
      */
-    public HITS(ReviewGraph graph, double delta, int iterationLimit, double initLabel) {
+    public HITS(ReviewGraph graph, double delta, int iterationLimit, double initLabel, boolean zNormalization) {
         similarityGraph = graph;
         quantityReviews = graph.getReviewQuantity();
         reviews = graph.getIncludedReviews();
-        weightedGraph = graph.getGraph();           //shallow Copy
+
         converged = false;
+        useZNormalization = zNormalization;
         EPSILON = delta;
         MAX_ITERATIONS = iterationLimit;
         INIT_LABEL = initLabel;
+
         // no transformation needed since it is an undirected graph
-        adjacencyMatrix = generateUpdateMatrix(weightedGraph);
+        double[][] tmp = generateUpdateMatrix(graph.getGraph()); // self-edges are set to zero
+        adjacencyMatrix = MatrixUtils.matrixMultiplicationSameSize(tmp, tmp);
+        //scoreCollection = new HashMap<>();
     }
 
     /**
@@ -86,19 +95,35 @@ public class HITS {
             updateScoresAllNodes(updatedScores);
             iterations++;
         }
+
         /****make it a prob. distribution ***/
 
         double maxVal = getMax(updatedScores);
 
-        makeProbDisrtibution(updatedScores, maxVal);
+        if (useZNormalization){
+            double minVal = getMin(updatedScores);
+            zNormalize(updatedScores, maxVal, minVal);
+        }else {
+            makeProbDistribution(updatedScores, maxVal);
+        }
+
 
         /*** write Predication after denormalizing*/
         writePredictions(updatedScores);
     }
 
-    private void makeProbDisrtibution(double[] updatedScores, double maxVal) {
+    private void makeProbDistribution(double[] updatedScores, double maxVal) {
         for (int i = 0; i < updatedScores.length; i++) {
             updatedScores[i] = updatedScores[i] / maxVal;
+        }
+    }
+    private void zNormalize(double[] updatedScores, double maxVal, double minVal) {
+        for (int i = 0; i < updatedScores.length; i++) {
+            //double tmp1 =(updatedScores[i] - minVal);
+            //double tmp2 = maxVal- minVal;
+            //double tmp3 = tmp1 / tmp2;
+            //System.out.println(tmp3);
+            updatedScores[i] = (updatedScores[i] - minVal) / (maxVal- minVal);
         }
     }
 
@@ -108,9 +133,17 @@ public class HITS {
             if (d > max){
                 max = d;
             }
-
         }
         return max;
+    }
+    private double getMin(double[] updatedScores) {
+        double min =1.0;
+        for ( double d: updatedScores  ) {
+            if (d < min){
+                min = d;
+            }
+        }
+        return min;
     }
 
     /**
@@ -225,5 +258,14 @@ public class HITS {
                 reviews[i].setPredictedRating(scoreVecHITS[i]);
             }
         }
+    }
+
+    /**
+     * Method to obtain the calculated adjacency Matrix.
+     *
+     * @return double[][] AdjacencyMatrix
+     */
+    public double[][] getAdjacencyMatrix() {
+        return adjacencyMatrix;
     }
 }
