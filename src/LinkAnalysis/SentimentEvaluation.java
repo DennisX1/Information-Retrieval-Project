@@ -5,27 +5,31 @@ import data.Review;
 
 public class SentimentEvaluation {
     private Review[] allReviews;
-    private double sqrMeanError;
+    private double meanSqrError;
+    private double absSqrError;
+    private double pearsonCoefficient;
 
     public SentimentEvaluation(Review[] reviews){
         allReviews= reviews;
-        sqrMeanError=0.0;
+        meanSqrError =0.0;
+        absSqrError =0.0;
+        pearsonCoefficient = 0.0;
     }
 
-    public void createEvaluationSME(){
+    public void createEvaluationMSE(){
         int counter =0;
         for (Review rev : allReviews) {
             if(!rev.isKnown()){
                 counter++;
-                sqrMeanError += Math.pow ((rev.getRealRating() - rev.getPredictedRating()), 2);
+                meanSqrError += Math.pow ((rev.getRealRating() - rev.getPredictedRating()), 2);
 
             }
         }
-         sqrMeanError= sqrMeanError/counter;
+         meanSqrError = meanSqrError /counter;
     }
 
-    public void printSME(String additionalText){
-        System.out.println(additionalText + "Squared Mean Error is: " + sqrMeanError);
+    public void printMSE(String additionalText){
+        System.out.println(additionalText + "Squared Mean Error is: " + meanSqrError);
     }
 
 

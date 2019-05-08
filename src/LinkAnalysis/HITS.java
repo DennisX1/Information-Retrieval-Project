@@ -86,8 +86,31 @@ public class HITS {
             updateScoresAllNodes(updatedScores);
             iterations++;
         }
+        /****make it a prob. distribution ***/
+
+        double maxVal = getMax(updatedScores);
+
+        makeProbDisrtibution(updatedScores, maxVal);
+
         /*** write Predication after denormalizing*/
         writePredictions(updatedScores);
+    }
+
+    private void makeProbDisrtibution(double[] updatedScores, double maxVal) {
+        for (int i = 0; i < updatedScores.length; i++) {
+            updatedScores[i] = updatedScores[i] / maxVal;
+        }
+    }
+
+    private double getMax(double[] updatedScores) {
+        double max =-1.0;
+        for ( double d: updatedScores  ) {
+            if (d > max){
+                max = d;
+            }
+
+        }
+        return max;
     }
 
     /**
@@ -157,6 +180,7 @@ public class HITS {
      * @return double - denormalized HITS score
      */
     private double denormalizeHITSScore(double normalizedScore) {
+         //return normalizedScore * 5;
         return normalizedScore * 4 + 1;
     }
 
@@ -168,7 +192,7 @@ public class HITS {
      */
     private double[] normalizeScores(double[] scoreVec) {
         //System.out.println("Before normalization");
-        //MatrixUtils.printVectorDouble(scoreVec);
+        MatrixUtils.printVectorDouble(scoreVec);
         double sumScores = 0.0;
         for (int i = 0; i < scoreVec.length; i++) {
             sumScores += scoreVec[i];
@@ -182,6 +206,7 @@ public class HITS {
                 scoreVec[i] = scoreVec[i] / sumScores;
             }
         }
+        MatrixUtils.printVectorDouble(scoreVec);
         return scoreVec;
     }
 

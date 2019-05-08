@@ -5,7 +5,6 @@ import LinkAnalysis.SentimentEvaluation;
 import Preprocessing.Stemmer;
 import Preprocessing.StopWordRemovalUtils;
 import SimMeasuresUtils.TFIDFUtils;
-import SimMeasuresUtils.WordEmbeedingsUtils;
 import data.Review;
 import data.ReviewGraph;
 import io.UtilsJson;
@@ -14,8 +13,8 @@ import io.UtilsJson;
  * Class containing the main method for the project for Sentiment Propagation with Link Analysis.
  */
 public class SentimentPropagation_Main {
-    private static final int QUANTITY_REVIEWS= 10;
-    private static final int PERCENTAGE_KNOWN_LABELS = 50;
+    private static final int QUANTITY_REVIEWS= 1000;
+    private static final int PERCENTAGE_KNOWN_LABELS = 90;
     private static final double EPSILON = 0.000001;
     private static final int MAX_ITERATIONS = 30;
     private static final double INIT_LABEL = 0.4;
@@ -41,7 +40,7 @@ public class SentimentPropagation_Main {
 
 
         /*** create Graph for nodes */
-        ReviewGraph graph = new ReviewGraph(QUANTITY_REVIEWS);
+
 
 
         /*** Sim Measures */
@@ -51,21 +50,17 @@ public class SentimentPropagation_Main {
         Review stemmed [] = Stemmer.stemReviews(cleaned);
         /*** TFIDF with stop word removal + stemming */
         double [] [] tfIdfSims = TFIDFUtils.computeSimilarities(stemmed);
-        /*** WordEmbeddings with stop word removal */
-        double [] []  wordEmbeddingSims = WordEmbeedingsUtils.calculateSimWordEmbeedingsUtils(cleaned);
+        /*** wordembeddings with stop word removal */
+        //double [] []  wordembeddingsims = wordembeedingsutils.calculatesimwordembeedingsutils(cleaned);
 
-        graph.addALLReviewsRANDOM(reviews);
 
-        // ReviewGraph graph = new ReviewGraph(reviews, double[][] similarities)
 
-        //System.out.println(graph.toString());
+        /************************* run with tf-idf ******************/
+
+        ReviewGraph graph = new ReviewGraph(reviews, tfIdfSims);
+        System.out.println(graph.toString());
 
         /*** run PageRank Algo */
-
-
-
-
-
 
 
 
@@ -78,8 +73,14 @@ public class SentimentPropagation_Main {
         double[] finalVec = HITS_algo.finalHITScores();
 
         SentimentEvaluation evaHITS = new SentimentEvaluation(reviews);
-        evaHITS.createEvaluationSME();
-        evaHITS.printSME("HITS \t");
+        evaHITS.createEvaluationMSE();
+        evaHITS.printMSE("HITS \t");
 
+
+        /************************* RUN WITH TF-IDF ******************/
+
+        //double [] []  wordEmbeddingSims = WordEmbeedingsUtils.calculateSimWordEmbeedingsUtils(cleaned);
+        //graph = new ReviewGraph(reviews, wordEmbeddingSims);
+        //System.out.println(graph.toString());
     }
 }

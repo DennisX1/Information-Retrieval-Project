@@ -88,7 +88,7 @@ public class WordEmbeedingsUtils {
                         vectorValues[i - 1] = Double.parseDouble(tokens[i]);
                     }
 
-                    System.out.println("Creating HashMap Count: " + tempCounter+" / 300001");
+                    //System.out.println("Creating HashMap Count: " + tempCounter+" / 300001");
                     tempCounter++;
 
                     denseVectorForWords.put(temp, vectorValues);

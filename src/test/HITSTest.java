@@ -4,6 +4,9 @@ import LinkAnalysis.HITS;
 import data.Review;
 import data.ReviewGraph;
 import io.MatrixUtils;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,8 +18,8 @@ public class HITSTest {
 
     private static ReviewGraph testGraph;
 
-
-    private static void testHITS() {
+    @Test
+    public void testHITS() {
         HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL);
         algoHITS.runHITS();
         double[] predictions = algoHITS.finalHITScores();
@@ -27,7 +30,8 @@ public class HITSTest {
         assertEquals(2.7, predictions[2], 0.01);
     }
 
-    private static void testRTHITS() {
+    @Test
+    public void testRTHITS() {
         QUANTITY_REVIEWS = 1000;
         HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL);
         final long timeStart = System.currentTimeMillis();
@@ -38,8 +42,8 @@ public class HITSTest {
 
     }
 
-
-    public static void main(String[] args) {
+    @BeforeClass
+    public static void init() {
         //______________________PREPARATIONS__________
         Review[] reviews = new Review[QUANTITY_REVIEWS];
         reviews[0] = new Review("a", 1.0, true);
@@ -51,10 +55,6 @@ public class HITSTest {
                 {0.4, 0.6, 1.0}};
 
         testGraph = new ReviewGraph(reviews, testSimilarities);
-
-        //______________________TESTS__________
-        testHITS();
-        //testRTHITS();
     }
 
 }

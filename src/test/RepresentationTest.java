@@ -68,7 +68,7 @@ public class RepresentationTest {
         double[][] denseRepresentation = WordEmbeedingsUtils.calculateSimWordEmbeedingsUtils(cleaned);
 
 
-        assertEquals(1, denseRepresentation[0][0], 0);
+        assertEquals(1.0, denseRepresentation[0][0], 0);
         assertEquals(0.5179, denseRepresentation[0][1], 0);
         assertEquals(0.5179, denseRepresentation[1][0], 0);
         assertEquals(1.0, denseRepresentation[1][1], 0);
