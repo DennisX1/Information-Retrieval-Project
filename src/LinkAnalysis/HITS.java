@@ -26,7 +26,6 @@ public class HITS {
     private static double EPSILON;
     private static int MAX_ITERATIONS;
     private static double INIT_LABEL;
-    //private static Map<Integer, HITS_Score> scoreCollection;
 
     /**
      * Constructor of the HITS Algorithm.
@@ -45,9 +44,7 @@ public class HITS {
         INIT_LABEL = initLabel;
 
         // no transformation needed since it is an undirected graph
-        double[][] tmp = generateUpdateMatrix(graph.getGraph()); // self-edges are set to zero
-        adjacencyMatrix = MatrixUtils.matrixMultiplicationSameSize(tmp, tmp);
-        //scoreCollection = new HashMap<>();
+        adjacencyMatrix =  generateUpdateMatrix(graph.getGraph());
     }
 
     /**

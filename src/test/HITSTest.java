@@ -22,8 +22,8 @@ public class HITSTest {
     public void testHITSAdjacency() {
         HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL, false);
 
-        //AdjacencyMatrix
-
+        //AdjacencyMatrix if we use A*A
+/*
         double[][] adjMatrix = algoHITS.getAdjacencyMatrix();
         assertEquals(0.31, adjMatrix[0][0], 0.01);
         assertEquals(0.42, adjMatrix[0][1], 0.01);
@@ -33,12 +33,23 @@ public class HITSTest {
         assertEquals(0.07, adjMatrix[1][2], 0.01);
         assertEquals(0.06, adjMatrix[2][0], 0.01);
         assertEquals(0.12, adjMatrix[2][1], 0.01);
-        assertEquals(0.76, adjMatrix[2][2], 0.01);
+        assertEquals(0.76, adjMatrix[2][2], 0.01); */
+
+        //AdjacencyMatrix if we use A
+        double[][] adjMatrix = algoHITS.getAdjacencyMatrix();
+        assertEquals(0., adjMatrix[0][0], 0.01);
+        assertEquals(0.3, adjMatrix[0][1], 0.01);
+        assertEquals(0.7, adjMatrix[0][2], 0.01);
+        assertEquals(0.1, adjMatrix[1][0], 0.01);
+        assertEquals(0, adjMatrix[1][1], 0.01);
+        assertEquals(0.8, adjMatrix[1][2], 0.01);
+        assertEquals(0.4, adjMatrix[2][0], 0.01);
+        assertEquals(0.6, adjMatrix[2][1], 0.01);
+        assertEquals(0, adjMatrix[2][2], 0.01);
     }
     @Test
     public void testHITS() {
         HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL, false);
-
 
         algoHITS.runHITS();
         double[] predictions = algoHITS.finalHITScores();
@@ -46,7 +57,7 @@ public class HITSTest {
 
         assertEquals(1.0, predictions[0], 0.01);
         assertEquals(5.0, predictions[1], 0.01);
-        assertEquals(2.7, predictions[2], 0.01);
+        assertEquals(5, predictions[2], 0.01);
     }
 
     @Test
