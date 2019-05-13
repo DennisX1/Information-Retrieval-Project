@@ -27,6 +27,7 @@ classroom-file-service/src/test/java/resources/Test.pdf
 # *.eps
 Pervasive_Classroom.pdf
 
+
 ## Generated if empty string is given at "Please type another file name for output:"
 .pdf
 
@@ -193,3 +194,8 @@ DB/
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
+/data/wiki-news-300d-1M.vec
+/Information-Retrieval-Project.iml
+/data/DenseVector.txt
+/data/DenseTest.txt
+data/DenseTest.txt

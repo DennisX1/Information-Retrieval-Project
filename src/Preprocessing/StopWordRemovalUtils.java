@@ -66,7 +66,7 @@ public class StopWordRemovalUtils {
     }
 
     /**
-     * Method to remove the stopwords + punctuation marks
+     * Method to remove the stopWords + punctuation marks
      *
      * @param reviewString set of reviews
      * @return "cleaned" reviews
@@ -96,13 +96,4 @@ public class StopWordRemovalUtils {
 
     }
 
-    public static StopWordRemovalUtils getInstance() {
-
-
-        return instance;
-    }
-
-    public List<String> getStopWordList() {
-        return stopWordList;
-    }
 }

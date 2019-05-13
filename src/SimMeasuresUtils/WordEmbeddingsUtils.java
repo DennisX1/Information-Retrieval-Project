@@ -2,7 +2,6 @@ package SimMeasuresUtils;
 
 import Preprocessing.StopWordRemovalUtils;
 import data.Review;
-import io.UtilsJson;
 
 import java.io.*;
 import java.text.DecimalFormat;
@@ -11,25 +10,23 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import static io.UtilsJson.getReviewsFromDataset;
-
 /**
- * Class offering operation to calculate the cosine similarity between reviews based on word embeddings
+ * Class offering operations to calculate the cosine similarity between reviews based on word embeddings
  *
  * @author Dennis
  */
 
-public class WordEmbeedingsUtils {
+public class WordEmbeddingsUtils {
 
     private HashMap<String, double[]> denseVectorForWords;
-    private static WordEmbeedingsUtils instance;
+    private static WordEmbeddingsUtils instance;
     private HashMap<Integer, double[]> denseVectorForDocument;
     private double[][] cosineArray;
 
-    public static double[][] calculateSimWordEmbeedingsUtils(Review[] reviews) {
+    public static double[][] calculateSimWordEmbeddingsUtils(Review[] reviews) {
 
         if (instance == null) {
-            instance = new WordEmbeedingsUtils();
+            instance = new WordEmbeddingsUtils();
             instance.loadData();
         }
 
@@ -41,6 +38,7 @@ public class WordEmbeedingsUtils {
 
     /**
      * Method to reduce the size of the original FastText file
+     * Is only used once
      */
     private void createFile(int threshold, String pathname) {
         int counter = 0;
@@ -66,8 +64,6 @@ public class WordEmbeedingsUtils {
      * Method to load the dense vectors from the file
      * Each line of the file consists of a word followed by 300 double values
      * Method reads the file, split it into tokens, and store it into a HashMap<String,[]Double>
-     *
-     *
      */
     private void loadData() {
 
@@ -82,17 +78,18 @@ public class WordEmbeedingsUtils {
                 String temp = tokens[0];
 
 
-                    double[] vectorValues = new double[tokens.length - 1];
+                double[] vectorValues = new double[tokens.length - 1];
 
-                    for (int i = 1; i < tokens.length; i++) {
-                        vectorValues[i - 1] = Double.parseDouble(tokens[i]);
-                    }
+                for (int i = 1; i < tokens.length; i++) {
+                    vectorValues[i - 1] = Double.parseDouble(tokens[i]);
+                }
 
-                    //System.out.println("Creating HashMap Count: " + tempCounter+" / 300001");
-                    tempCounter++;
+                if (tempCounter % 100 == 0) {
+                    System.out.println("Creating HashMap Count: " + tempCounter + " / 300001");
+                }
+                tempCounter++;
 
-                    denseVectorForWords.put(temp, vectorValues);
-
+                denseVectorForWords.put(temp, vectorValues);
 
 
             }
@@ -116,17 +113,17 @@ public class WordEmbeedingsUtils {
             int counter = 0;
             double[] averagedValues = new double[300];
             String review = reviews[i].getText();
-            String[] tokenized = review.split("\\s");
+            String[] tokenizedReview = review.split("\\s");
 
 
             //iterate over words
-            for (int j = 0; j < tokenized.length; j++) {
+            for (int j = 0; j < tokenizedReview.length; j++) {
 
-                if (denseVectorForWords.containsKey(tokenized[j])) {
+                if (denseVectorForWords.containsKey(tokenizedReview[j])) {
 
                     //iterate over averagedValues
                     for (int k = 0; k < averagedValues.length; k++) {
-                        double[] wordVector = denseVectorForWords.get(tokenized[j]);
+                        double[] wordVector = denseVectorForWords.get(tokenizedReview[j]);
                         averagedValues[k] += wordVector[k];
 
                     }
@@ -198,42 +195,9 @@ public class WordEmbeedingsUtils {
 
         }
 
-        System.out.println(Arrays.deepToString(cosineArray).replace("], ", "]\n"));
-
 
         return cosineArray;
 
     }
 
-
-    public static void main(String[] args) {
-
-//        WordEmbeedingsUtils wordEmbeedingsUtils = new WordEmbeedingsUtils();
-//        wordEmbeedingsUtils.createFile(500, "DenseTest.txt");
-
-
-        Review [] review = new Review[2];
-        review[0] = new Review("work story",5.0,true);
-        review[1] = new Review("police media",5.0,true);
-        Review [] clean = StopWordRemovalUtils.removeStopWords(review);
-        List<String> stopWordList = StopWordRemovalUtils.getInstance().getStopWordList();
-        WordEmbeedingsUtils.calculateSimWordEmbeedingsUtils(clean);
-
-
-
-//        try {
-//            Review[] reviews = getReviewsFromDataset(100, 50, UtilsJson.Dataset.AMAZON_INSTANT_VIDEO);
-//            Review[] clean = StopWordRemovalUtils.removeStopWords(reviews);
-//            List<String> stopWordList = StopWordRemovalUtils.getInstance().getStopWordList();
-//            WordEmbeedingsUtils.calculateSimWordEmbeedingsUtils(clean, stopWordList);
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//
-//    }
-
-
-    }
 }
