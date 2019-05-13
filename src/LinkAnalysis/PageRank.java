@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class PageRank {
     public static final double EPSILON = 0.001;
-    public static final int MAX_ITERATIONS = 20000;
+    public static final int MAX_ITERATIONS = 200;
 
 
     public static void main(String[] args) throws Exception {
@@ -76,6 +76,7 @@ public class PageRank {
         double[] sum = new double[weights.length];
 
         for (int i = 0; i < weights.length; i++) {
+            weights[i][i] = 0;
             for (int j = 0; j < weights[i].length; j++) {
                 sum[i] = sum[i] + weights[i][j];
             }
@@ -84,7 +85,6 @@ public class PageRank {
         for (int i = 0; i < weights.length; i++) {
             for (int j = 0; j < weights[i].length; j++) {
                 weights[i][j] = weights[i][j] / sum[i];
-                weights[i][i] = 0;
             }
         }
     }
@@ -96,6 +96,7 @@ public class PageRank {
     public static double[] performCalculations(Review[] reviews, double[][] weights, double initialValue) throws OutOfMemoryError {
         long startTime = System.currentTimeMillis();
 
+        normalizeWeights(weights);
         double[] rankNew = new double[reviews.length];
         double[] rank;
         int counter = 0;
@@ -105,14 +106,17 @@ public class PageRank {
         do {
             rank = rankNew;
             rankNew = UtilsJson.vectorMatrixMult(rank, weights);
-            System.out.println("\nIteration " + ++counter);
+            //System.out.println("\nIteration " + ++counter);
             setKnownReviews(rankNew, reviews);
-            printRank(rankNew);
+          //  printRank(rankNew);
 
         } while (counter < MAX_ITERATIONS && !PageRank.isConverged(rank, rankNew, EPSILON));
         long elapsedTime = System.currentTimeMillis() - startTime;
         printTime(elapsedTime);
         printRank(rankNew);
+        for (int i = 0; i < rankNew.length; i++) {
+            reviews[i].setPredictedRating(rankNew[i]);
+        }
         return rankNew;
     }
 
@@ -152,6 +156,7 @@ public class PageRank {
         }
         return true;
     }
+
 
 }
 

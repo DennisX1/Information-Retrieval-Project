@@ -64,6 +64,15 @@ public class Review {
 
     @Override
     public String toString() {
+        if (text.length() <40){
+            return "Review{" +
+                    "id=" + id +
+                    ", text='" + text + "[...]" + '\'' +
+                    ", realRating=" + realRating +
+                    ", predictedRating=" + predictedRating +
+                    ", isKnown=" + isKnown +
+                    '}';
+        }
         return "Review{" +
                 "id=" + id +
                 ", text='" + text.substring(0, 40) + "[...]" + '\'' +
