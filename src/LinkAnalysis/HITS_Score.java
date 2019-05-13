@@ -18,7 +18,7 @@ public class HITS_Score {
     public void updateScores(double updatedScore) {
         score = updatedScore;
     }
-    
+
     public int compareTo(HITS_Score otherScore) {
         if (this.score > otherScore.score) {
             return 1;
@@ -29,7 +29,7 @@ public class HITS_Score {
         return 0;
     }
 
-        @Override
+    @Override
     public String toString() {
         return "HITS Score: " + score;
     }

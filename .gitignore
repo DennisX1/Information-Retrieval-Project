@@ -188,7 +188,6 @@ fabric.properties
 *.tar.gz
 *.rar
 *.txt
-
 # Database
 DB/
 

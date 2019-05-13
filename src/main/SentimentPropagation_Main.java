@@ -41,7 +41,7 @@ public class SentimentPropagation_Main {
 
 
         /*** create Graph for nodes */
-        ReviewGraph graph = new ReviewGraph(QUANTITY_REVIEWS);
+
 
 
         /*** Sim Measures */
@@ -54,11 +54,12 @@ public class SentimentPropagation_Main {
         /*** WordEmbeddings with stop word removal */
         double [] []  wordEmbeddingSims = WordEmbeddingsUtils.calculateSimWordEmbeddingsUtils(cleaned);
 
-        graph.addALLReviewsRANDOM(reviews);
 
-        // ReviewGraph graph = new ReviewGraph(reviews, double[][] similarities)
 
-        //System.out.println(graph.toString());
+        /************************* run with tf-idf ******************/
+
+        ReviewGraph graph = new ReviewGraph(reviews, tfIdfSims);
+        System.out.println(graph.toString());
 
         /*** run PageRank Algo */
 
@@ -67,19 +68,20 @@ public class SentimentPropagation_Main {
 
 
 
-
-
-
-
-
         /*** run HITS ALgo */
-        HITS    HITS_algo = new HITS(graph,  EPSILON, MAX_ITERATIONS, INIT_LABEL);
+        HITS    HITS_algo = new HITS(graph,  EPSILON, MAX_ITERATIONS, INIT_LABEL, true);
         HITS_algo.runHITS();
         double[] finalVec = HITS_algo.finalHITScores();
 
         SentimentEvaluation evaHITS = new SentimentEvaluation(reviews);
-        evaHITS.createEvaluationSME();
-        evaHITS.printSME("HITS \t");
+        evaHITS.createEvaluationMSE();
+        evaHITS.printMSE("HITS \t");
 
+
+        /************************* RUN WITH TF-IDF ******************/
+
+        //double [] []  wordEmbeddingSims = WordEmbeedingsUtils.calculateSimWordEmbeedingsUtils(cleaned);
+        //graph = new ReviewGraph(reviews, wordEmbeddingSims);
+        //System.out.println(graph.toString());
     }
 }

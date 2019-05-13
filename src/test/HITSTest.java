@@ -4,6 +4,9 @@ import LinkAnalysis.HITS;
 import data.Review;
 import data.ReviewGraph;
 import io.MatrixUtils;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,21 +18,66 @@ public class HITSTest {
 
     private static ReviewGraph testGraph;
 
+    @Test
+    public void testHITSAdjacency() {
+        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL, false);
 
-    private static void testHITS() {
-        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL);
+        //AdjacencyMatrix if we use A*A
+/*
+        double[][] adjMatrix = algoHITS.getAdjacencyMatrix();
+        assertEquals(0.31, adjMatrix[0][0], 0.01);
+        assertEquals(0.42, adjMatrix[0][1], 0.01);
+        assertEquals(0.24, adjMatrix[0][2], 0.01);
+        assertEquals(0.32, adjMatrix[1][0], 0.01);
+        assertEquals(0.51, adjMatrix[1][1], 0.01);
+        assertEquals(0.07, adjMatrix[1][2], 0.01);
+        assertEquals(0.06, adjMatrix[2][0], 0.01);
+        assertEquals(0.12, adjMatrix[2][1], 0.01);
+        assertEquals(0.76, adjMatrix[2][2], 0.01); */
+
+        //AdjacencyMatrix if we use A
+        double[][] adjMatrix = algoHITS.getAdjacencyMatrix();
+        assertEquals(0., adjMatrix[0][0], 0.01);
+        assertEquals(0.3, adjMatrix[0][1], 0.01);
+        assertEquals(0.7, adjMatrix[0][2], 0.01);
+        assertEquals(0.1, adjMatrix[1][0], 0.01);
+        assertEquals(0, adjMatrix[1][1], 0.01);
+        assertEquals(0.8, adjMatrix[1][2], 0.01);
+        assertEquals(0.4, adjMatrix[2][0], 0.01);
+        assertEquals(0.6, adjMatrix[2][1], 0.01);
+        assertEquals(0, adjMatrix[2][2], 0.01);
+    }
+    @Test
+    public void testHITS() {
+        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL, false);
+
         algoHITS.runHITS();
         double[] predictions = algoHITS.finalHITScores();
         //MatrixUtils.printVectorDouble(predictions);
 
         assertEquals(1.0, predictions[0], 0.01);
         assertEquals(5.0, predictions[1], 0.01);
-        assertEquals(2.7, predictions[2], 0.01);
+        assertEquals(5, predictions[2], 0.01);
     }
 
-    private static void testRTHITS() {
+    @Test
+    public void testHITSZNormalise() {
+        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL, true);
+
+
+        algoHITS.runHITS();
+        double[] predictions = algoHITS.finalHITScores();
+        //MatrixUtils.printVectorDouble(predictions);
+
+        assertEquals(1.0, predictions[0], 0.01);
+        assertEquals(5.0, predictions[1], 0.01);
+        assertEquals(1.0, predictions[2], 0.01);
+    }
+
+    @Test
+    public void testRTHITS() {
         QUANTITY_REVIEWS = 1000;
-        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL);
+        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL, false);
         final long timeStart = System.currentTimeMillis();
         algoHITS.runHITS();
         final long timeEnd = System.currentTimeMillis();
@@ -38,8 +86,8 @@ public class HITSTest {
 
     }
 
-
-    public static void main(String[] args) {
+    @BeforeClass
+    public static void init() {
         //______________________PREPARATIONS__________
         Review[] reviews = new Review[QUANTITY_REVIEWS];
         reviews[0] = new Review("a", 1.0, true);
@@ -51,10 +99,6 @@ public class HITSTest {
                 {0.4, 0.6, 1.0}};
 
         testGraph = new ReviewGraph(reviews, testSimilarities);
-
-        //______________________TESTS__________
-        testHITS();
-        //testRTHITS();
     }
 
 }
