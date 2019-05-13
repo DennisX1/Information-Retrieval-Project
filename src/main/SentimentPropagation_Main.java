@@ -1,7 +1,8 @@
 package main;
 
+import LinkAnalysis.Evaluation;
 import LinkAnalysis.HITS;
-import LinkAnalysis.SentimentEvaluation;
+import LinkAnalysis.PageRank;
 import Preprocessing.Stemmer;
 import Preprocessing.StopWordRemovalUtils;
 import SimMeasuresUtils.TFIDFUtils;
@@ -65,17 +66,13 @@ public class SentimentPropagation_Main {
 
 
 
-
-
-
         /*** run HITS ALgo */
         HITS    HITS_algo = new HITS(graph,  EPSILON, MAX_ITERATIONS, INIT_LABEL, true);
         HITS_algo.runHITS();
         double[] finalVec = HITS_algo.finalHITScores();
 
-        SentimentEvaluation evaHITS = new SentimentEvaluation(reviews);
-        evaHITS.createEvaluationMSE();
-        evaHITS.printMSE("HITS \t");
+        System.out.println("\nMSE HITS");
+        Evaluation.calcAndPrintMSE(reviews);
 
 
         /************************* RUN WITH TF-IDF ******************/
