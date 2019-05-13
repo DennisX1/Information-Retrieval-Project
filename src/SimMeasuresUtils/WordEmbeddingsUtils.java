@@ -1,14 +1,11 @@
 package SimMeasuresUtils;
 
-import Preprocessing.StopWordRemovalUtils;
 import data.Review;
 
 import java.io.*;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Class offering operations to calculate the cosine similarity between reviews based on word embeddings
@@ -121,11 +118,10 @@ public class WordEmbeddingsUtils {
 
                 if (denseVectorForWords.containsKey(tokenizedReview[j])) {
 
+                    double[] wordVector = denseVectorForWords.get(tokenizedReview[j]);
                     //iterate over averagedValues
                     for (int k = 0; k < averagedValues.length; k++) {
-                        double[] wordVector = denseVectorForWords.get(tokenizedReview[j]);
                         averagedValues[k] += wordVector[k];
-
                     }
 
                     counter++;
@@ -134,13 +130,21 @@ public class WordEmbeddingsUtils {
 
 
             }
-            for (int j = 0; j < averagedValues.length; j++) {
-                averagedValues[j] /= counter;
 
+            // special case if none of the words are inside the word embedding file
+            if (counter == 0) {
+                for (int j = 0; j < averagedValues.length; j++) {
+                    averagedValues[j] = 0;
+
+                }
+            } else {
+                for (int j = 0; j < averagedValues.length; j++) {
+                    averagedValues[j] /= counter;
+
+                }
             }
             denseVectorForDocument.put(i, averagedValues);
         }
-
     }
 
 
