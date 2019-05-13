@@ -16,13 +16,12 @@ import java.util.Map;
  * Update Matrix L <=> weighted Graph of reviews
  */
 public class HITS {
-    private ReviewGraph similarityGraph;
-    //private double[][] weightedGraph;
+     //private ReviewGraph similarityGraph;
     private Review[] reviews;
     private int quantityReviews;
     private double[][] adjacencyMatrix;
     private boolean converged;
-    private boolean useZNormalization;
+    //private boolean useZNormalization;
     private static double EPSILON;
     private static int MAX_ITERATIONS;
     private static double INIT_LABEL;
@@ -32,17 +31,16 @@ public class HITS {
      *
      * @param graph Review[] - Array of reviews that should be included
      */
-    public HITS(ReviewGraph graph, double delta, int iterationLimit, double initLabel, boolean zNormalization) {
-        similarityGraph = graph;
+    public HITS(ReviewGraph graph, double delta, int iterationLimit, double initLabel){//, boolean zNormalization) {
+        //similarityGraph = graph;
         quantityReviews = graph.getReviewQuantity();
         reviews = graph.getIncludedReviews();
 
         converged = false;
-        useZNormalization = zNormalization;
+        //useZNormalization = zNormalization; // not used anymore
         EPSILON = delta;
         MAX_ITERATIONS = iterationLimit;
         INIT_LABEL = initLabel;
-
         // no transformation needed since it is an undirected graph
         adjacencyMatrix =  generateUpdateMatrix(graph.getGraph());
     }
@@ -75,9 +73,8 @@ public class HITS {
         /***startPropagation */
         double[] updatedScores = new double[quantityReviews];
         int iterations = 0;
-        int test = 0;
         while (!converged && iterations < MAX_ITERATIONS) {
-            //System.out.println("Iteration: " + iterations);
+            System.out.println("Iteration: " + iterations);
 
             double[] oldScores = getOldScores();
             //MatrixUtils.printVectorDouble(oldScores);
@@ -92,9 +89,10 @@ public class HITS {
             updateScoresAllNodes(updatedScores);
             iterations++;
         }
-
         /****make it a prob. distribution ***/
-
+/* as discussed we do not normalize after the last iteration to make
+the evaluation results comparable between PageRank and HITS
+the values are only de-normalized
         double maxVal = getMax(updatedScores);
 
         if (useZNormalization){
@@ -103,8 +101,7 @@ public class HITS {
         }else {
             makeProbDistribution(updatedScores, maxVal);
         }
-
-
+*/
         /*** write Predication after denormalizing*/
         writePredictions(updatedScores);
     }
@@ -116,10 +113,6 @@ public class HITS {
     }
     private void zNormalize(double[] updatedScores, double maxVal, double minVal) {
         for (int i = 0; i < updatedScores.length; i++) {
-            //double tmp1 =(updatedScores[i] - minVal);
-            //double tmp2 = maxVal- minVal;
-            //double tmp3 = tmp1 / tmp2;
-            //System.out.println(tmp3);
             updatedScores[i] = (updatedScores[i] - minVal) / (maxVal- minVal);
         }
     }
@@ -210,8 +203,8 @@ public class HITS {
      * @return double - denormalized HITS score
      */
     private double denormalizeHITSScore(double normalizedScore) {
-         //return normalizedScore * 5;
-        return normalizedScore * 4 + 1;
+        return normalizedScore * 5;
+        //return normalizedScore * 4 + 1;
     }
 
     /**
@@ -221,21 +214,20 @@ public class HITS {
      * @return normalized double[] array with scores
      */
     private double[] normalizeScores(double[] scoreVec) {
-        //System.out.println("Before normalization");
+        System.out.println("Before normalization");
         MatrixUtils.printVectorDouble(scoreVec);
         double sumScores = 0.0;
         for (int i = 0; i < scoreVec.length; i++) {
             sumScores += scoreVec[i];
         }
-        // TODO what to do if the sum is zero?
-        if (sumScores == 0.0) {
+        if (sumScores <= 0.0) {
             System.out.println("oh oh this is no good...");
         }
-        if (sumScores > 0.0) {
-            for (int i = 0; i < scoreVec.length; i++) {
+
+        for (int i = 0; i < scoreVec.length; i++) {
                 scoreVec[i] = scoreVec[i] / sumScores;
-            }
         }
+
         MatrixUtils.printVectorDouble(scoreVec);
         return scoreVec;
     }
@@ -246,15 +238,19 @@ public class HITS {
      * @param scoreVecHITS double[] normalized, updated scores for all nodes
      */
     private void updateScoresAllNodes(double[] scoreVecHITS) {
+        boolean allConverged = false;
         for (int i = 0; i < scoreVecHITS.length; i++) {
             if (!reviews[i].isKnown()) {
                 // convergence
                 if (Math.abs(reviews[i].getPredictedRating() - scoreVecHITS[i]) < EPSILON) {
-                    converged = true;
+                    allConverged = true;
+                } else {
+                    allConverged = false;
                 }
                 reviews[i].setPredictedRating(scoreVecHITS[i]);
             }
         }
+        converged= allConverged;
     }
 
     /**
@@ -265,4 +261,13 @@ public class HITS {
     public double[][] getAdjacencyMatrix() {
         return adjacencyMatrix;
     }
+
+    /**
+     * Method to obtain the matrix of Reviews.
+     * @return
+     */
+    public Review[] getReviews() {
+        return reviews;
+    }
+
 }
