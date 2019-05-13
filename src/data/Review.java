@@ -23,13 +23,13 @@ public class Review {
     }
 
 
-
     public Review(String text, double realRating, boolean isKnown) {
         this.text = text;
         this.id = runningNumber++;
         this.realRating = realRating;
         this.isKnown = isKnown;
-        this.normalizedRating = realRating/5;
+        this.normalizedRating = realRating / 5;
+        this.predictedRating = 0;
     }
 
     public int getId() {
@@ -56,6 +56,7 @@ public class Review {
         this.text = text;
 
     }
+
     public static void printReviews(Review[] reviews) {
         for (Review r : reviews) {
             System.out.println(r);
@@ -64,6 +65,15 @@ public class Review {
 
     @Override
     public String toString() {
+        if (text.length() < 40) {
+            return "Review{" +
+                    "id=" + id +
+                    ", text='" + text + "[...]" + '\'' +
+                    ", realRating=" + realRating +
+                    ", predictedRating=" + predictedRating +
+                    ", isKnown=" + isKnown +
+                    '}';
+        }
         return "Review{" +
                 "id=" + id +
                 ", text='" + text.substring(0, 40) + "[...]" + '\'' +

@@ -20,7 +20,7 @@ public class HITSTest {
 
     @Test
     public void testHITSAdjacency() {
-        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL, false);
+        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL);
 
         //AdjacencyMatrix if we use A*A
 /*
@@ -49,7 +49,7 @@ public class HITSTest {
     }
     @Test
     public void testHITS() {
-        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL, false);
+        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL);
 
         algoHITS.runHITS();
         double[] predictions = algoHITS.finalHITScores();
@@ -60,9 +60,9 @@ public class HITSTest {
         assertEquals(5, predictions[2], 0.01);
     }
 
-    @Test
+    /*@Test
     public void testHITSZNormalise() {
-        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL, true);
+        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL);
 
 
         algoHITS.runHITS();
@@ -72,12 +72,12 @@ public class HITSTest {
         assertEquals(1.0, predictions[0], 0.01);
         assertEquals(5.0, predictions[1], 0.01);
         assertEquals(1.0, predictions[2], 0.01);
-    }
+    }*/
 
     @Test
     public void testRTHITS() {
         QUANTITY_REVIEWS = 1000;
-        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL, false);
+        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL);
         final long timeStart = System.currentTimeMillis();
         algoHITS.runHITS();
         final long timeEnd = System.currentTimeMillis();
