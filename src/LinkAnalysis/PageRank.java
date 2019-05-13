@@ -67,7 +67,7 @@ public class PageRank {
             }
         } while (counter++ < MAX_ITERATIONS && !isConverged(oldRanks, newRanks, EPSILON));
         long elapsedTime = System.currentTimeMillis() - startTime;
-        printTime(elapsedTime);
+        printTime(elapsedTime, counter);
         printRank(newRanks);
         return newRanks;
     }
@@ -108,11 +108,11 @@ public class PageRank {
             rankNew = UtilsJson.vectorMatrixMult(rank, weights);
             //System.out.println("\nIteration " + ++counter);
             setKnownReviews(rankNew, reviews);
-          //  printRank(rankNew);
+            //  printRank(rankNew);
 
         } while (counter < MAX_ITERATIONS && !PageRank.isConverged(rank, rankNew, EPSILON));
         long elapsedTime = System.currentTimeMillis() - startTime;
-        printTime(elapsedTime);
+        printTime(elapsedTime, counter);
         printRank(rankNew);
         for (int i = 0; i < rankNew.length; i++) {
             reviews[i].setPredictedRating(rankNew[i]);
@@ -120,13 +120,14 @@ public class PageRank {
         return rankNew;
     }
 
-    private static void printTime(long elapsedTime) {
+    private static void printTime(long elapsedTime, int it) {
         double seconds = elapsedTime / 1000.0;
         int s = (int) (seconds % 60);
         int m = (int) ((seconds / 60) % 60);
         int h = (int) ((seconds / (60 * 60)) % 24);
         System.out.println("\nExecution time Page Rank: ");
         System.out.println(String.format("%d:%02d:%02d", h, m, s));
+        System.out.println("Iterations " + it);
     }
 
     private static void setKnownReviews(double[] rank, Review[] reviews) {
