@@ -37,7 +37,7 @@ public class HITS {
         reviews = graph.getIncludedReviews();
 
         converged = false;
-        //useZNormalization = zNormalization; // not used anymore
+        //useZNormalization = false;// zNormalization; // not used anymore
         EPSILON = delta;
         MAX_ITERATIONS = iterationLimit;
         INIT_LABEL = initLabel;
@@ -74,7 +74,7 @@ public class HITS {
         double[] updatedScores = new double[quantityReviews];
         int iterations = 0;
         while (!converged && iterations < MAX_ITERATIONS) {
-            System.out.println("Iteration: " + iterations);
+            //System.out.println("Iteration: " + iterations);
 
             double[] oldScores = getOldScores();
             //MatrixUtils.printVectorDouble(oldScores);
@@ -89,7 +89,7 @@ public class HITS {
             updateScoresAllNodes(updatedScores);
             iterations++;
         }
-        /****make it a prob. distribution ***/
+        //****make it a prob. distribution ***/
 /* as discussed we do not normalize after the last iteration to make
 the evaluation results comparable between PageRank and HITS
 the values are only de-normalized
@@ -101,9 +101,10 @@ the values are only de-normalized
         }else {
             makeProbDistribution(updatedScores, maxVal);
         }
-*/
-        /*** write Predication after denormalizing*/
+
+        //*** write Predication after denormalizing*/
         writePredictions(updatedScores);
+
     }
 
     private void makeProbDistribution(double[] updatedScores, double maxVal) {
@@ -214,8 +215,8 @@ the values are only de-normalized
      * @return normalized double[] array with scores
      */
     private double[] normalizeScores(double[] scoreVec) {
-        System.out.println("Before normalization");
-        MatrixUtils.printVectorDouble(scoreVec);
+        //System.out.println("Before normalization");
+        //MatrixUtils.printVectorDouble(scoreVec);
         double sumScores = 0.0;
         for (int i = 0; i < scoreVec.length; i++) {
             sumScores += scoreVec[i];
@@ -227,8 +228,7 @@ the values are only de-normalized
         for (int i = 0; i < scoreVec.length; i++) {
                 scoreVec[i] = scoreVec[i] / sumScores;
         }
-
-        MatrixUtils.printVectorDouble(scoreVec);
+       // MatrixUtils.printVectorDouble(scoreVec);
         return scoreVec;
     }
 
