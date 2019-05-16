@@ -72,11 +72,11 @@ public class PageRank {
         return newRanks;
     }
 
-    private static void normalizeWeights(double[][] weights) {
+    private static double[][] normalizeWeights(double[][] weights) {
         double[] sum = new double[weights.length];
-
+        double[][] ret = new double[weights.length][weights[0].length];
         for (int i = 0; i < weights.length; i++) {
-            weights[i][i] = 0;
+            ret[i][i] = 0;
             for (int j = 0; j < weights[i].length; j++) {
                 sum[i] = sum[i] + weights[i][j];
             }
@@ -84,9 +84,10 @@ public class PageRank {
 
         for (int i = 0; i < weights.length; i++) {
             for (int j = 0; j < weights[i].length; j++) {
-                weights[i][j] = weights[i][j] / sum[i];
+                ret[i][j] = weights[i][j] / sum[i];
             }
         }
+        return ret;
     }
 
     public static double[] performCalculations(Review[] reviews, double[][] weights) throws OutOfMemoryError {
@@ -95,8 +96,7 @@ public class PageRank {
 
     public static double[] performCalculations(Review[] reviews, double[][] weights, double initialValue) throws OutOfMemoryError {
         long startTime = System.currentTimeMillis();
-
-        normalizeWeights(weights);
+        weights = normalizeWeights(weights);
         double[] rankNew = new double[reviews.length];
         double[] rank;
         int counter = 0;
@@ -110,7 +110,7 @@ public class PageRank {
             setKnownReviews(rankNew, reviews);
             //  printRank(rankNew);
 
-        } while (counter < MAX_ITERATIONS && !PageRank.isConverged(rank, rankNew, EPSILON));
+        } while (counter++ < MAX_ITERATIONS && !PageRank.isConverged(rank, rankNew, EPSILON));
         long elapsedTime = System.currentTimeMillis() - startTime;
         printTime(elapsedTime, counter);
         printRank(rankNew);
