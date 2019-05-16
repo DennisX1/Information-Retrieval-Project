@@ -81,7 +81,7 @@ public class WordEmbeddingsUtils {
                     vectorValues[i - 1] = Double.parseDouble(tokens[i]);
                 }
 
-                if (tempCounter % 100 == 0) {
+                if (tempCounter % 10000 == 0) {
                     System.out.println("Creating HashMap Count: " + tempCounter + " / 300001");
                 }
                 tempCounter++;
