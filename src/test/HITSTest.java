@@ -1,5 +1,6 @@
 package test;
 
+import LinkAnalysis.Evaluation;
 import LinkAnalysis.HITS;
 import data.Review;
 import data.ReviewGraph;
@@ -9,31 +10,20 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class HITSTest {
     private static int QUANTITY_REVIEWS = 3;
     private static final double EPSILON = 0.000001;
-    private static int MAX_ITERATIONS = 1;
+    private static int MAX_ITERATIONS = 2;
     private static final double INIT_LABEL = 0.4;
 
     private static ReviewGraph testGraph;
 
     @Test
     public void testHITSAdjacency() {
-        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL, false);
+        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL);
 
-        //AdjacencyMatrix if we use A*A
-/*
-        double[][] adjMatrix = algoHITS.getAdjacencyMatrix();
-        assertEquals(0.31, adjMatrix[0][0], 0.01);
-        assertEquals(0.42, adjMatrix[0][1], 0.01);
-        assertEquals(0.24, adjMatrix[0][2], 0.01);
-        assertEquals(0.32, adjMatrix[1][0], 0.01);
-        assertEquals(0.51, adjMatrix[1][1], 0.01);
-        assertEquals(0.07, adjMatrix[1][2], 0.01);
-        assertEquals(0.06, adjMatrix[2][0], 0.01);
-        assertEquals(0.12, adjMatrix[2][1], 0.01);
-        assertEquals(0.76, adjMatrix[2][2], 0.01); */
 
         //AdjacencyMatrix if we use A
         double[][] adjMatrix = algoHITS.getAdjacencyMatrix();
@@ -49,20 +39,24 @@ public class HITSTest {
     }
     @Test
     public void testHITS() {
-        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL, false);
+        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL);
 
         algoHITS.runHITS();
         double[] predictions = algoHITS.finalHITScores();
         //MatrixUtils.printVectorDouble(predictions);
 
-        assertEquals(1.0, predictions[0], 0.01);
-        assertEquals(5.0, predictions[1], 0.01);
-        assertEquals(5, predictions[2], 0.01);
+        assertEquals(1.0, predictions[0], 0.01); // should be the real label
+        assertEquals(5.0, predictions[1], 0.01); // should be the real label
+        assertEquals(2.07, predictions[2], 0.01); // prediction - denormalized
+
+        System.out.println("\nMSE HITS");
+        Evaluation.calcAndPrintMSE(algoHITS.getReviews());
+
     }
 
-    @Test
+    /*@Test
     public void testHITSZNormalise() {
-        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL, true);
+        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL);
 
 
         algoHITS.runHITS();
@@ -72,12 +66,12 @@ public class HITSTest {
         assertEquals(1.0, predictions[0], 0.01);
         assertEquals(5.0, predictions[1], 0.01);
         assertEquals(1.0, predictions[2], 0.01);
-    }
+    }*/
 
     @Test
     public void testRTHITS() {
         QUANTITY_REVIEWS = 1000;
-        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL, false);
+        HITS algoHITS = new HITS(testGraph, EPSILON, MAX_ITERATIONS, INIT_LABEL);
         final long timeStart = System.currentTimeMillis();
         algoHITS.runHITS();
         final long timeEnd = System.currentTimeMillis();

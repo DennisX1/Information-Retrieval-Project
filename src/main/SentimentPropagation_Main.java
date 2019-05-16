@@ -19,7 +19,7 @@ public class SentimentPropagation_Main {
     private static final int PERCENTAGE_KNOWN_LABELS = 80;
     private static final double EPSILON = 0.000001;
     private static final int MAX_ITERATIONS = 30;
-    private static final double INIT_LABEL = 0.4;
+    private static final double INIT_LABEL = 0.2;
 
 
 
@@ -41,44 +41,45 @@ public class SentimentPropagation_Main {
         }
 
 
-        /*** create Graph for nodes */
 
 
 
-        /*** Sim Measures */
-        /*** stop word removal */
+        //*** stop word removal */
         Review cleaned [] = StopWordRemovalUtils.removeStopWords(reviews);
-        /*** Stemming */
+        //*** Stemming */
         Review stemmed [] = Stemmer.stemReviews(cleaned);
-        /*** TFIDF with stop word removal + stemming */
+        //*** TFIDF with stop word removal + stemming */
         double [] [] tfIdfSims = TFIDFUtils.computeSimilarities(stemmed);
-        /*** WordEmbeddings with stop word removal */
+
+        //*** WordEmbeddings with stop word removal */
         double [] []  wordEmbeddingSims = WordEmbeddingsUtils.calculateSimWordEmbeddingsUtils(cleaned);
 
-
-
-        /************************* run with tf-idf ******************/
-
+        //************************* RUN WITH TF-IDF  ******************/
+        System.out.println("~~~~~~~RUN WITH TF_IDF~~~~~~~");
         ReviewGraph graph = new ReviewGraph(reviews, tfIdfSims);
-        System.out.println(graph.toString());
+        //System.out.println(graph.toString());
 
-        /*** run PageRank Algo */
-
-
-
-        /*** run HITS ALgo */
-        HITS    HITS_algo = new HITS(graph,  EPSILON, MAX_ITERATIONS, INIT_LABEL, true);
+        //*** run HITS ALgo */
+        HITS    HITS_algo = new HITS(graph,  EPSILON, MAX_ITERATIONS, INIT_LABEL);
         HITS_algo.runHITS();
-        double[] finalVec = HITS_algo.finalHITScores();
+
 
         System.out.println("\nMSE HITS");
         Evaluation.calcAndPrintMSE(reviews);
+        ///*** run PageRank Algo */
 
 
-        /************************* RUN WITH TF-IDF ******************/
 
-        //double [] []  wordEmbeddingSims = WordEmbeedingsUtils.calculateSimWordEmbeedingsUtils(cleaned);
-        //graph = new ReviewGraph(reviews, wordEmbeddingSims);
+
+        //************************* RUN WITH EMBEDDINGS ******************/
+        System.out.println("\n~~~~~~~RUN WITH EMBEDDINGS~~~~~~~");
+        graph = new ReviewGraph(reviews, wordEmbeddingSims);
         //System.out.println(graph.toString());
+
+        HITS_algo = new HITS(graph,  EPSILON, MAX_ITERATIONS, INIT_LABEL);
+        HITS_algo.runHITS();
+
+        System.out.println("\nMSE HITS");
+        Evaluation.calcAndPrintMSE(reviews);
     }
 }
