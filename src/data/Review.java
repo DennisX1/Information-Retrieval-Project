@@ -1,5 +1,7 @@
 package data;
 
+import java.util.Random;
+
 public class Review {
     private static int runningNumber = 0;
     private int id;
@@ -8,11 +10,28 @@ public class Review {
     private double predictedRating;
     private boolean isKnown;
     private double normalizedRating;
+    private static int runningNumber2 = 0;
 
     public double getNormalizedRating() {
         return normalizedRating;
     }
 
+    public static void addKnownPercentage(int percentageIncrease, Review[] reviews) {
+        int tries = 200000;
+        int increase = (int) (reviews.length * percentageIncrease / 100.0);
+        int increased = 0;
+        Random rnd = new Random(runningNumber + runningNumber2++);
+        int i;
+        while (increased < increase && tries > 0) {
+            i = rnd.nextInt();
+            tries--;
+            if (!reviews[i].isKnown()) {
+                reviews[i].setKnown(true);
+                increased++;
+                tries = 200000;
+            }
+        }
+    }
 
     public double getPredictedRating() {
         return predictedRating;
