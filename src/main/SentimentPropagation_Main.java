@@ -15,8 +15,7 @@ import io.UtilsJson;
  * Class containing the main method for the project for Sentiment Propagation with Link Analysis.
  */
 public class SentimentPropagation_Main {
-    private static final int QUANTITY_REVIEWS = 1000;
-    //    private static final int PERCENTAGE_KNOWN_LABELS = 80;
+    private static final int QUANTITY_REVIEWS = 3000;
     private static final double EPSILON = 0.000001;
     private static final int MAX_ITERATIONS = 30;
     private static final double INIT_LABEL = 0.2;
@@ -29,7 +28,7 @@ public class SentimentPropagation_Main {
         Review[] reviews = new Review[QUANTITY_REVIEWS];
         try {
             reviews = UtilsJson.getReviewsFromDataset(
-                    QUANTITY_REVIEWS, 5, UtilsJson.Dataset.AMAZON_INSTANT_VIDEO);
+                    QUANTITY_REVIEWS, 0, UtilsJson.Dataset.AMAZON_INSTANT_VIDEO);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -48,7 +47,6 @@ public class SentimentPropagation_Main {
 
         /*** Sim Measures */
         /*** stop word removal */
-        System.out.println("");
         System.out.println("****Removing Stopwords****");
 
         Review cleaned[] = StopWordRemovalUtils.removeStopWords(reviews);
@@ -56,33 +54,25 @@ public class SentimentPropagation_Main {
         System.out.println("****Stopwords Removed****");
 
         /*** WordEmbeddings with stop word removal */
-        System.out.println("");
         System.out.println("****Computing Word embeddings****");
         double[][] wordEmbeddingSims = WordEmbeddingsUtils.calculateSimWordEmbeddingsUtils(cleaned);
         System.out.println("****Finished WordEmbedding computing****");
 
         /*** Stemming */
-        System.out.println("");
         System.out.println("****Stemming****");
-
         Review stemmed[] = Stemmer.stemReviews(cleaned);
-
         System.out.println("****Stemming finished****");
 
 
         /*** TFIDF with stop word removal + stemming */
-        System.out.println("");
         System.out.println("****Computing TF-IDF values****");
-
         double[][] tfIdfSims = TFIDFUtils.computeSimilarities(stemmed);
         System.out.println("****Finished TF-IDF computing****");
-        System.out.println("");
-
 
         stemmed = null;
         cleaned = null;
+
         System.out.println("****Performing Evaluation****");
-        System.out.println("");
         for (int percentageKnownLabels = 5; percentageKnownLabels <= 99; percentageKnownLabels += 5) {
 
             Review.addKnownPercentage(5, reviews);
