@@ -15,20 +15,21 @@ import io.UtilsJson;
  * Class containing the main method for the project for Sentiment Propagation with Link Analysis.
  */
 public class SentimentPropagation_Main {
-    private static final int QUANTITY_REVIEWS= 1000;
-    private static final int PERCENTAGE_KNOWN_LABELS = 80;
+    private static final int QUANTITY_REVIEWS = 1000;
+    //    private static final int PERCENTAGE_KNOWN_LABELS = 80;
     private static final double EPSILON = 0.000001;
     private static final int MAX_ITERATIONS = 30;
     private static final double INIT_LABEL = 0.2;
 
 
-
     public static void main(String[] args) {
+
+        System.out.println("****Loading Reviews****");
         /*** get random dataset **/
         Review[] reviews = new Review[QUANTITY_REVIEWS];
         try {
             reviews = UtilsJson.getReviewsFromDataset(
-                    QUANTITY_REVIEWS, PERCENTAGE_KNOWN_LABELS, UtilsJson.Dataset.AMAZON_INSTANT_VIDEO);
+                    QUANTITY_REVIEWS, 5, UtilsJson.Dataset.AMAZON_INSTANT_VIDEO);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -36,50 +37,106 @@ public class SentimentPropagation_Main {
         }
 
 
-        if (reviews[QUANTITY_REVIEWS-1] == null ){
+        if (reviews[QUANTITY_REVIEWS - 1] == null) {
             System.exit(1);
         }
 
 
+        /*** create Graph for nodes */
+        System.out.println("****Reviews loaded****");
 
 
+        /*** Sim Measures */
+        /*** stop word removal */
+        System.out.println("");
+        System.out.println("****Removing Stopwords****");
 
-        //*** stop word removal */
-        Review cleaned [] = StopWordRemovalUtils.removeStopWords(reviews);
-        //*** Stemming */
-        Review stemmed [] = Stemmer.stemReviews(cleaned);
-        //*** TFIDF with stop word removal + stemming */
-        double [] [] tfIdfSims = TFIDFUtils.computeSimilarities(stemmed);
+        Review cleaned[] = StopWordRemovalUtils.removeStopWords(reviews);
 
-        //*** WordEmbeddings with stop word removal */
-        double [] []  wordEmbeddingSims = WordEmbeddingsUtils.calculateSimWordEmbeddingsUtils(cleaned);
+        System.out.println("****Stopwords Removed****");
 
-        //************************* RUN WITH TF-IDF  ******************/
-        System.out.println("~~~~~~~RUN WITH TF_IDF~~~~~~~");
-        ReviewGraph graph = new ReviewGraph(reviews, tfIdfSims);
-        //System.out.println(graph.toString());
+        /*** WordEmbeddings with stop word removal */
+        System.out.println("");
+        System.out.println("****Computing Word embeddings****");
+        double[][] wordEmbeddingSims = WordEmbeddingsUtils.calculateSimWordEmbeddingsUtils(cleaned);
+        System.out.println("****Finished WordEmbedding computing****");
 
-        //*** run HITS ALgo */
-        HITS    HITS_algo = new HITS(graph,  EPSILON, MAX_ITERATIONS, INIT_LABEL);
-        HITS_algo.runHITS();
+        /*** Stemming */
+        System.out.println("");
+        System.out.println("****Stemming****");
 
+        Review stemmed[] = Stemmer.stemReviews(cleaned);
 
-        System.out.println("\nMSE HITS");
-        Evaluation.calcAndPrintMSE(reviews);
-        ///*** run PageRank Algo */
+        System.out.println("****Stemming finished****");
 
 
+        /*** TFIDF with stop word removal + stemming */
+        System.out.println("");
+        System.out.println("****Computing TF-IDF values****");
+
+        double[][] tfIdfSims = TFIDFUtils.computeSimilarities(stemmed);
+        System.out.println("****Finished TF-IDF computing****");
+        System.out.println("");
 
 
-        //************************* RUN WITH EMBEDDINGS ******************/
-        System.out.println("\n~~~~~~~RUN WITH EMBEDDINGS~~~~~~~");
-        graph = new ReviewGraph(reviews, wordEmbeddingSims);
-        //System.out.println(graph.toString());
+        stemmed = null;
+        cleaned = null;
+        System.out.println("****Performing Evaluation****");
+        System.out.println("");
+        for (int percentageKnownLabels = 5; percentageKnownLabels <= 99; percentageKnownLabels += 5) {
 
-        HITS_algo = new HITS(graph,  EPSILON, MAX_ITERATIONS, INIT_LABEL);
-        HITS_algo.runHITS();
+            Review.addKnownPercentage(5, reviews);
+            //************************* RUN WITH TF-IDF  ******************/
+            //   System.out.println("~~~~~~~RUN WITH TF_IDF~~~~~~~");
+            ReviewGraph graph = new ReviewGraph(reviews, tfIdfSims);
+            //System.out.println(graph.toString());
 
-        System.out.println("\nMSE HITS");
-        Evaluation.calcAndPrintMSE(reviews);
+
+            /*** run HITS ALgo */
+            System.out.println("");
+            HITS HITS_algo = new HITS(graph, EPSILON, MAX_ITERATIONS, INIT_LABEL);
+            HITS_algo.runHITS();
+
+            System.out.println("Combination: TF-IDF/HITS           Known Labels: " + percentageKnownLabels + "%" +
+                    "      MAE: " + Evaluation.calculateMAE(reviews) +
+                    "      MSE: " + Evaluation.calculateMSE(reviews) +
+                    "      PCC: " + Evaluation.calculatePCC(reviews));
+
+            ///*** run PageRank Algo with TF-IDF */
+
+            PageRank.performCalculations(reviews, tfIdfSims);
+            System.out.println("Combination: TF-IDF/PageRank       Known Labels: " + percentageKnownLabels + "%" +
+                    "      MAE: " + Evaluation.calculateMAE(reviews) +
+                    "      MSE: " + Evaluation.calculateMSE(reviews) +
+                    "      PCC: " + Evaluation.calculatePCC(reviews));
+
+            //************************* RUN WITH EMBEDDINGS ******************/
+            //  System.out.println("\n~~~~~~~RUN WITH EMBEDDINGS~~~~~~~");
+
+            graph = new ReviewGraph(reviews, wordEmbeddingSims);
+            //System.out.println(graph.toString());
+
+            HITS_algo = new HITS(graph, EPSILON, MAX_ITERATIONS, INIT_LABEL);
+            HITS_algo.runHITS();
+
+
+            System.out.println("Combination: Embedding/HITS        Known Labels: " + percentageKnownLabels + "%" +
+                    "      MAE: " + Evaluation.calculateMAE(reviews) +
+                    "      MSE: " + Evaluation.calculateMSE(reviews) +
+                    "      PCC: " + Evaluation.calculatePCC(reviews));
+
+
+            //*** Page Rank Embedding*////
+
+            PageRank.performCalculations(reviews, wordEmbeddingSims);
+
+
+            System.out.println("Combination: Embedding/PageRank    Known Labels: " + percentageKnownLabels + "%" +
+                    "      MAE: " + Evaluation.calculateMAE(reviews) +
+                    "      MSE: " + Evaluation.calculateMSE(reviews) +
+                    "      PCC: " + Evaluation.calculatePCC(reviews));
+
+
+        }
     }
 }

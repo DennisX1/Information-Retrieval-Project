@@ -23,7 +23,7 @@ public class Review {
         Random rnd = new Random(runningNumber + runningNumber2++);
         int i;
         while (increased < increase && tries > 0) {
-            i = rnd.nextInt();
+            i = (int) (rnd.nextDouble() * reviews.length);
             tries--;
             if (!reviews[i].isKnown()) {
                 reviews[i].setKnown(true);

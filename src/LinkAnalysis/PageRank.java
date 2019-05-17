@@ -112,8 +112,8 @@ public class PageRank {
 
         } while (counter++ < MAX_ITERATIONS && !PageRank.isConverged(rank, rankNew, EPSILON));
         long elapsedTime = System.currentTimeMillis() - startTime;
-        printTime(elapsedTime, counter);
-        printRank(rankNew);
+       // printTime(elapsedTime, counter);
+        //printRank(rankNew);
         for (int i = 0; i < rankNew.length; i++) {
             reviews[i].setPredictedRating(rankNew[i]);
         }
@@ -125,9 +125,9 @@ public class PageRank {
         int s = (int) (seconds % 60);
         int m = (int) ((seconds / 60) % 60);
         int h = (int) ((seconds / (60 * 60)) % 24);
-        System.out.println("\nExecution time Page Rank: ");
-        System.out.println(String.format("%d:%02d:%02d", h, m, s));
-        System.out.println("Iterations " + it);
+//        System.out.println("\nExecution time Page Rank: ");
+//        System.out.println(String.format("%d:%02d:%02d", h, m, s));
+//        System.out.println("Iterations " + it);
     }
 
     private static void setKnownReviews(double[] rank, Review[] reviews) {
