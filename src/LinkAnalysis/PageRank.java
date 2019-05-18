@@ -4,6 +4,7 @@ import data.Review;
 import io.UtilsJson;
 
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.Random;
 
 public class PageRank {
@@ -14,14 +15,20 @@ public class PageRank {
         double[] sum = new double[weights.length];
         double[][] ret = new double[weights.length][weights[0].length];
         for (int i = 0; i < weights.length; i++) {
-            ret[i][i] = 0;
             for (int j = 0; j < weights[i].length; j++) {
+                if (i == j) {
+                    continue;
+                }
                 sum[i] = sum[i] + weights[i][j];
             }
         }
 
         for (int i = 0; i < weights.length; i++) {
             for (int j = 0; j < weights[i].length; j++) {
+                if (i == j) {
+                    ret[i][i] = 0;
+                    continue;
+                }
                 ret[i][j] = weights[i][j] / sum[i];
             }
         }
