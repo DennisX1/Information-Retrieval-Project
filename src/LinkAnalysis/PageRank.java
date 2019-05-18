@@ -12,24 +12,24 @@ public class PageRank {
     public static final int MAX_ITERATIONS = 200;
 
     private static double[][] normalizeWeights(double[][] weights) {
-        double[] sum = new double[weights.length];
-        double[][] ret = new double[weights.length][weights[0].length];
-        for (int i = 0; i < weights.length; i++) {
-            for (int j = 0; j < weights[i].length; j++) {
-                if (i == j) {
+        double[] sum = new double[weights[0].length];
+        for (int y = 0; y < weights[0].length; y++) {
+            sum[y] = 0;
+            for (int x = 0; x < weights.length; x++) {
+                if (x == y) {
                     continue;
                 }
-                sum[i] = sum[i] + weights[i][j];
+                sum[y] = sum[y] + weights[x][y];
             }
         }
-
-        for (int i = 0; i < weights.length; i++) {
-            for (int j = 0; j < weights[i].length; j++) {
-                if (i == j) {
-                    ret[i][i] = 0;
+        double[][] ret = new double[weights.length][weights[0].length];
+        for (int x = 0; x < weights.length; x++) {
+            for (int y = 0; y < weights[x].length; y++) {
+                if (x == y) {
+                    ret[x][y] = 0;
                     continue;
                 }
-                ret[i][j] = weights[i][j] / sum[i];
+                ret[x][y] = weights[x][y] / sum[y];
             }
         }
         return ret;

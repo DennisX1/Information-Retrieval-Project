@@ -39,7 +39,7 @@ public class PageRankTest {
         for (int i = 0; i < reviews.length; i++) {
             reviews[i] = new Review("a", 0, false);
         }
-        double[] rank = PageRank.performCalculations(reviews, weights,1);
+        double[] rank = PageRank.performCalculations(reviews, weights,0.25);
 
         assertEquals(0.38, rank[0], 0.01);
         assertEquals(0.12, rank[1], 0.01);
