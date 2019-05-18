@@ -1,6 +1,7 @@
 package io;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.*;
 
 import Preprocessing.Stemmer;
@@ -14,6 +15,8 @@ import org.json.JSONObject;
 
 public class UtilsJson {
 
+    private final static double evaluationPercentage = 0.1;
+
     /**
      * Gets the Reviews from the files.
      *
@@ -25,26 +28,55 @@ public class UtilsJson {
     public static Review[] getReviewsFromDataset(int amount, int percentageKnown, Dataset dataset) throws Exception {
         // Get all data first
         ArrayList<Review> reviews = readJSON(dataset);
+        ArrayList<Review> markedReviews = new ArrayList<>();
         // Random with seeding so results stay consistent with the same amount but varies for different amounts
         Random rnd = new Random(314159265359l * amount);
         if (amount > reviews.size()) {
             throw new Exception("You chose to get an amount of " + amount + " while the dataset is only of the size " + reviews.size());
         }
-        // Shuffle the data to get a good average
+
+        if (percentageKnown / 100.0 + evaluationPercentage > 1) {
+            throw new Exception("You cannot have " + percentageKnown + "% known Reviews while using " + evaluationPercentage
+                    + "% as Evaluation Reviews");
+        }
+
+        // get the
+        int knownTarget = (int) (percentageKnown / 100.0 * amount + 0.999);
+        int known = 0;
+
+        // Mark the first x% as evaluation reviews and known and add them to marked reviews
+        Review cur = null;
+        for (int i = 0; i < amount * evaluationPercentage; i++) {
+            cur = reviews.get(i);
+            cur.setEvalReview(true);
+            cur.setKnown(false);
+            markedReviews.add(cur);
+            reviews.remove(cur);
+        }
+
+        // Mix up reviews and add the first n reviews as known reviews to markedReviews
         Collections.shuffle(reviews, rnd);
-        Review[] result = new Review[amount];
-        ArrayList<Boolean> isKnown = new ArrayList<>();
-        // produce an List with the specified percentage of known and unknown booleans
-        for (int i = 0; i < amount; i++) {
-            isKnown.add(i < amount * percentageKnown / 100.0);
+        cur = null;
+        while (known < knownTarget) {
+            cur = reviews.get(0);
+            cur.setKnown(true);
+            cur.setEvalReview(false);
+            markedReviews.add(cur);
+            reviews.remove(cur);
+            known++;
         }
-        // Shuffle it and give the reviews the data
-        Collections.shuffle(isKnown, rnd);
-        for (int i = 0; i < amount; i++) {
-            result[i] = reviews.get(i);
-            result[i].setKnown(isKnown.get(i));
+
+        // Add remaining reviews as unknown to markedReviews
+        cur = null;
+        while (markedReviews.size() < amount) {
+            cur = reviews.get(0);
+            cur.setKnown(false);
+            markedReviews.add(cur);
         }
-        return result;
+
+        // Shuffle the collection and return it as array
+        Collections.shuffle(markedReviews, rnd);
+        return markedReviews.toArray(new Review[0]);
     }
 
 
@@ -130,7 +162,7 @@ public class UtilsJson {
             for (int i = 0; i < stemmed.length; i++) {
                 System.out.println(stemmed[i].getText());
             }
-              TFIDFUtils.computeSimilarities(stemmed);
+            TFIDFUtils.computeSimilarities(stemmed);
 
             //   Review[] reviews = getReviewsFromDataset(120, 50, Dataset.AMAZON_INSTANT_VIDEO);
             //     printReviews(reviews);

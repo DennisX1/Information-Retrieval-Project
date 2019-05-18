@@ -21,7 +21,7 @@ public class SentimentPropagation_Main {
     private static final double INIT_LABEL = 0.2;
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         System.out.println("****Loading Reviews****");
         /*** get random dataset **/
