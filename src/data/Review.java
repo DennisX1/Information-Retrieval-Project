@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class Review {
     private static int runningNumber = 0;
-    private static int runningNumber2 = 0;
+    private static int runningNumber2 = 10;
 
     private boolean evalReview;
     private int id;
@@ -31,7 +31,7 @@ public class Review {
         int tries = 200000;
         int increase = (int) (reviews.length * percentageIncrease / 100.0);
         int increased = 0;
-        Random rnd = new Random(runningNumber + runningNumber2++);
+        Random rnd = new Random(2019 * runningNumber2++);
         int i;
         while (increased < increase && tries > 0) {
             i = (int) (rnd.nextDouble() * reviews.length);

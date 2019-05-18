@@ -72,6 +72,7 @@ public class UtilsJson {
             cur = reviews.get(0);
             cur.setKnown(false);
             markedReviews.add(cur);
+            reviews.remove(cur);
         }
 
         // Shuffle the collection and return it as array
