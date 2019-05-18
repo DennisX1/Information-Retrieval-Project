@@ -29,7 +29,11 @@ public class PageRank {
                     ret[x][y] = 0;
                     continue;
                 }
-                ret[x][y] = weights[x][y] / sum[y];
+                if (sum[y] == 0 || weights[x][y] == 0) {
+                    ret[x][y] = 0;
+                } else {
+                    ret[x][y] = weights[x][y] / sum[y];
+                }
             }
         }
         return ret;
