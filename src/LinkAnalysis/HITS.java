@@ -54,10 +54,16 @@ public class HITS {
      * @return double[][] adjacency matrix  a diagonal filled with zeros.
      */
     private double[][] generateUpdateMatrix(double[][] weightedGraph) {
+        int counter =0;
         double[][] adjustedGraph = new double[weightedGraph.length][weightedGraph.length];
         for (int i = 0; i < weightedGraph.length; i++) {
             for (int j = 0; j < weightedGraph[i].length; j++) {
-                adjustedGraph[i][j] = weightedGraph[i][j];
+                if (weightedGraph[i][j] < 0.0004){
+                    adjustedGraph[i][j] =0;
+                    counter++;
+                }else {
+                    adjustedGraph[i][j] = weightedGraph[i][j];
+                }
                 if (i == j) {
                     adjustedGraph[i][j] = 0;
                 }

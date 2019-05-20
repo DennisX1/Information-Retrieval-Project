@@ -71,6 +71,12 @@ public class SentimentPropagation_Main {
         stemmed = null;
         cleaned = null;
 
+        double[] maxMinTFID = getMinMaxMatrix(tfIdfSims);
+        double[] maxMinEmbeddings = getMinMaxMatrix(wordEmbeddingSims);
+
+        //Thresholding
+
+
         System.out.println("****Performing Evaluation****");
         for (int percentageKnownLabels = 5; percentageKnownLabels < 90; percentageKnownLabels += 5) {
 
@@ -90,7 +96,10 @@ public class SentimentPropagation_Main {
                     "      MAE: " + Evaluation.calculateMAE(reviews) +
                     "      MSE: " + Evaluation.calculateMSE(reviews) +
                     "      PCC: " + Evaluation.calculatePCC(reviews));
-
+            System.out.println("CombinationV2: TF-IDF/HITS           Known Labels: " + percentageKnownLabels + "%" +
+                    "      MAE: " + Evaluation.calculateMAE_standard(reviews) +
+                    "      MSE: " + Evaluation.calculateMSE_standard(reviews) +
+                    "      PCC: " + Evaluation.calculatePCC_standard(reviews));
             ///*** run PageRank Algo with TF-IDF */
 
             PageRank.performCalculations(reviews, tfIdfSims);
@@ -113,7 +122,10 @@ public class SentimentPropagation_Main {
                     "      MAE: " + Evaluation.calculateMAE(reviews) +
                     "      MSE: " + Evaluation.calculateMSE(reviews) +
                     "      PCC: " + Evaluation.calculatePCC(reviews));
-
+            System.out.println("CombinationV2: TF-IDF/HITS           Known Labels: " + percentageKnownLabels + "%" +
+                    "      MAE: " + Evaluation.calculateMAE_standard(reviews) +
+                    "      MSE: " + Evaluation.calculateMSE_standard(reviews) +
+                    "      PCC: " + Evaluation.calculatePCC_standard(reviews));
 
             //*** Page Rank Embedding*////
 
@@ -127,5 +139,52 @@ public class SentimentPropagation_Main {
 
 
         }
+    }
+
+    private static void getStatistics(Review[] reviews) {
+        int counter1 = 0;
+        int counter2 = 0;
+        int counter3= 0;
+        int counter4 = 0;
+        int counter5 =0;
+        int counterKomisch =0;
+
+        for (Review r: reviews) {
+            if (r.getRealRating() ==1.0){
+                counter1++;}
+            else if (r.getRealRating() ==2.0) {
+                counter2++;
+            }
+            else if (r.getRealRating() ==3.0) {
+                counter3++;
+            }
+            else if (r.getRealRating() ==4.0) {
+                counter4++;
+            }
+            else if (r.getRealRating() ==5.0) {
+                counter5++;
+            }
+            else {
+                counterKomisch++;}
+        }
+    }
+    private static double[] getMinMaxMatrix(double[][] matrix) {
+        double[] minmax = new double[2];
+        double min =2;
+        double  max =-1;
+        for (int i = 0; i <  matrix.length; i++) {
+            for (int j = i+1; j <matrix[i].length ; j++) {
+                //min
+                if(matrix[i][j]<min && i != j && matrix[i][j]> 0.0){
+                    min =matrix[i][j];
+                }
+                if (matrix[i][j]>max && i != j && matrix[i][j]< 1.0){
+                    max =matrix[i][j];
+                }
+            }
+        }
+        minmax[0] =min;
+        minmax[1] = max;
+        return  minmax;
     }
 }
