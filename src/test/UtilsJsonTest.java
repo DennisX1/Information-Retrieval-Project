@@ -1,7 +1,9 @@
 package test;
 
+import data.Review;
 import io.MatrixUtils;
 import io.UtilsJson;
+import jdk.jshell.execution.Util;
 import org.junit.Test;
 
 import java.util.Random;
@@ -61,9 +63,8 @@ public class UtilsJsonTest {
     }
 
 
-
     @Test
-    public void vectorMatrixMult() {
+    public void vectorMatrixMultTest() {
         double[] a = new double[3];
         double[][] b = new double[2][3];
         a[0] = 1;
@@ -82,4 +83,28 @@ public class UtilsJsonTest {
         assertEquals(40, c[1], 0.001);
     }
 
+
+    @Test
+    public void getReviewsFromDataset() {
+        try {
+            Review[] reviews = UtilsJson.getReviewsFromDataset(1000, 12, UtilsJson.Dataset.AMAZON_INSTANT_VIDEO);
+            int known = 0;
+            int eval = 0;
+            for (Review r : reviews) {
+                if (r.isKnown()) {
+                    known++;
+                }
+                if (r.isEvalReview()) {
+                    eval++;
+                }
+                if (r.isKnown() && r.isEvalReview()) {
+                    fail("review [" + r + "] is both known and eval");
+                }
+            }
+            assertEquals(120, known);
+            assertEquals(100, eval);
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
 }

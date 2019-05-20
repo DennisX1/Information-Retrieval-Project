@@ -21,7 +21,7 @@ public class SentimentPropagation_Main {
     private static final double INIT_LABEL = 0.2;
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         System.out.println("****Loading Reviews****");
         /*** get random dataset **/
@@ -29,7 +29,6 @@ public class SentimentPropagation_Main {
         try {
             reviews = UtilsJson.getReviewsFromDataset(
                     QUANTITY_REVIEWS, 0, UtilsJson.Dataset.AMAZON_INSTANT_VIDEO);
-
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
@@ -73,7 +72,7 @@ public class SentimentPropagation_Main {
         cleaned = null;
 
         System.out.println("****Performing Evaluation****");
-        for (int percentageKnownLabels = 5; percentageKnownLabels <= 99; percentageKnownLabels += 5) {
+        for (int percentageKnownLabels = 5; percentageKnownLabels < 90; percentageKnownLabels += 5) {
 
             Review.addKnownPercentage(5, reviews);
             //************************* RUN WITH TF-IDF  ******************/
