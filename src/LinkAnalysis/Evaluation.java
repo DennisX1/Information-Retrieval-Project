@@ -56,7 +56,7 @@ public class Evaluation {
         xAvg = xAvg / counter;
         yAvg = yAvg / counter;
         for (Review r : reviews) {
-            if (r.isKnown()) {
+            if (!r.isEvalReview()) {
                 continue;
             } else {
                 top = top + (xAvg - r.getPredictedRating()) * (yAvg - r.getRealRating());
