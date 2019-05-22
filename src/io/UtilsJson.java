@@ -139,58 +139,9 @@ public class UtilsJson {
 
     }
 
-    public static void main(String[] args) {
-        try {
-            Review[] reviews = getReviewsFromDataset(3, 50, Dataset.AMAZON_INSTANT_VIDEO);
-            //printReviews(reviews);
-            System.out.println("NORMAL HIER");
-            for (int i = 0; i < reviews.length; i++) {
-                System.out.println(reviews[i].getText());
-            }
-
-            Review[] clean = StopWordRemovalUtils.removeStopWords(reviews);
-
-            System.out.println("STOP WORD HIER");
-            for (int i = 0; i < clean.length; i++) {
-                System.out.println(clean[i].getText());
-            }
-
-
-            Review[] stemmed = Stemmer.stemReviews(clean);
-
-
-            System.out.println("STEMMING HIER");
-            for (int i = 0; i < stemmed.length; i++) {
-                System.out.println(stemmed[i].getText());
-            }
-            TFIDFUtils.computeSimilarities(stemmed);
-
-            //   Review[] reviews = getReviewsFromDataset(120, 50, Dataset.AMAZON_INSTANT_VIDEO);
-            //     printReviews(reviews);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        double[][] a = new double[3][1];
-        double[][] b = new double[2][3];
-        a[0][0] = 1;
-        a[1][0] = 4;
-        a[2][0] = 6;
-
-        b[0][0] = 1;
-        b[1][0] = 2;
-        b[0][1] = 3;
-        b[1][1] = 4;
-        b[0][2] = 5;
-        b[1][2] = 6;
-
-        double[][] c = matrixMult(a, b);
-        System.out.println("[" + c[0][0] + "," + c[1][0] + "]");
-        System.out.println(c.length);
-    }
-
     public enum Dataset {
-        AMAZON_INSTANT_VIDEO("data/Amazon_Instant_Video_5.json", 37126, 4.209529709637451);
+        AMAZON_INSTANT_VIDEO("data/Amazon_Instant_Video_5.json", 37126, 4.209529709637451),
+        TOOLS_AND_HOME_IMPROVEMENT("data/Tools_and_Home_Improvement_5.json", 37126, 4);
 
         private String path;
         private int maxAmount;
@@ -242,5 +193,21 @@ public class UtilsJson {
         return c;
     }
 
+
+    public static void main(String[] args) {
+        ArrayList<Review> reviews
+                = null;
+        try {
+            reviews = readJSON(Dataset.TOOLS_AND_HOME_IMPROVEMENT);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        int[] ratings = new int[5];
+
+        for (Review r : reviews) {
+            ratings[(int) (r.getRealRating()) - 1]++;
+        }
+        System.out.println(Arrays.toString(ratings));
+    }
 
 }

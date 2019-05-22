@@ -11,6 +11,15 @@ public class PageRank {
     public static final double EPSILON = 0.001;
     public static final int MAX_ITERATIONS = 200;
 
+    public static void useAverage(Review[] reviews) {
+        double avg = UtilsJson.Dataset.AMAZON_INSTANT_VIDEO.getAverageRating();
+        for (Review r : reviews
+        ) {
+            if (r.isEvalReview())
+                r.setPredictedRating(avg);
+        }
+    }
+
     private static double[][] normalizeWeights(double[][] weights) {
         double[] sum = new double[weights[0].length];
         for (int y = 0; y < weights[0].length; y++) {

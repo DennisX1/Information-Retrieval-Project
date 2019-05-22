@@ -46,6 +46,4 @@ public class PageRankTest {
         assertEquals(0.29, rank[2], 0.01);
         assertEquals(0.19, rank[3], 0.01);
     }
-
-
 }

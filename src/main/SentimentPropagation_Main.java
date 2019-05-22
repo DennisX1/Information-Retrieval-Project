@@ -72,7 +72,7 @@ public class SentimentPropagation_Main {
         cleaned = null;
 
         System.out.println("****Performing Evaluation****");
-        for (int percentageKnownLabels = 5; percentageKnownLabels < 90; percentageKnownLabels += 5) {
+        for (int percentageKnownLabels = 5; percentageKnownLabels <= 90; percentageKnownLabels += 5) {
 
             Review.addKnownPercentage(5, reviews);
             //************************* RUN WITH TF-IDF  ******************/
@@ -125,7 +125,12 @@ public class SentimentPropagation_Main {
                     "      MSE: " + Evaluation.calculateMSE(reviews) +
                     "      PCC: " + Evaluation.calculatePCC(reviews));
 
+            PageRank.useAverage(reviews);
 
+            System.out.println("Combination: use Average           Known Labels: " + percentageKnownLabels + "%" +
+                    "      MAE: " + Evaluation.calculateMAE(reviews) +
+                    "      MSE: " + Evaluation.calculateMSE(reviews) +
+                    "      PCC: " + Evaluation.calculatePCC(reviews));
         }
     }
 }
