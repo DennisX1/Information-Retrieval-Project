@@ -42,7 +42,27 @@ public class HITS {
         MAX_ITERATIONS = iterationLimit;
         INIT_LABEL = initLabel;
         // no transformation needed since it is an undirected graph
+        //double[][] tmp = generateUpdateMatrix(graph.getGraph());
         adjacencyMatrix =  generateUpdateMatrix(graph.getGraph());
+    }
+    /**
+     * Constructor of the HITS Algorithm.
+     *
+     * @param graph Review[] - Array of reviews that should be included
+     */
+    public HITS(ReviewGraph graph, double delta, int iterationLimit, double initLabel, double[][] AA){//, boolean zNormalization) {
+        //similarityGraph = graph;
+        quantityReviews = graph.getReviewQuantity();
+        reviews = graph.getIncludedReviews();
+
+        converged = false;
+        //useZNormalization = false;// zNormalization; // not used anymore
+        EPSILON = delta;
+        MAX_ITERATIONS = iterationLimit;
+        INIT_LABEL = initLabel;
+        // no transformation needed since it is an undirected graph
+
+        adjacencyMatrix =  AA;
     }
 
     /**
@@ -54,18 +74,21 @@ public class HITS {
      * @return double[][] adjacency matrix  a diagonal filled with zeros.
      */
     private double[][] generateUpdateMatrix(double[][] weightedGraph) {
-        int counter =0;
+        int counter =0; int counterZero=0;
         double[][] adjustedGraph = new double[weightedGraph.length][weightedGraph.length];
         for (int i = 0; i < weightedGraph.length; i++) {
             for (int j = 0; j < weightedGraph[i].length; j++) {
-                if (weightedGraph[i][j] < 0.0004){
+                /*if (weightedGraph[i][j] == 0.0) {
+                    adjustedGraph[i][j] = 0;
+                    counterZero++;
+                }else if(weightedGraph[i][j] < 0.5){
                     adjustedGraph[i][j] =0;
                     counter++;
-                }else {
+                }else {*/
                     adjustedGraph[i][j] = weightedGraph[i][j];
-                }
+                //}
                 if (i == j) {
-                    adjustedGraph[i][j] = 0;
+                    adjustedGraph[i][j] = 0.0;
                 }
             }
         }
@@ -73,6 +96,7 @@ public class HITS {
     }
 
     /**
+     *
      * Method the trigger the HITS Algorithm.
      */
     public void runHITS() {
@@ -85,6 +109,7 @@ public class HITS {
             double[] oldScores = getOldScores();
             //MatrixUtils.printVectorDouble(oldScores);
             //Multiply and save in HitScores
+            double[][] A = {{1,2,3,4},{5,0,0,8},{9,0,0,3},{4,5,6,7}};
             updatedScores = MatrixUtils.multiplyMatrixVector(adjacencyMatrix, oldScores);
 
             // normalize Scores
@@ -196,9 +221,9 @@ the values are only de-normalized
 
     private void writePredictions(double[] updatedScores) {
         for (int j = 0; j < quantityReviews; j++) { // for each node get score
-            if (!reviews[j].isKnown()) {
+            //if (!reviews[j].isKnown()) {
                 reviews[j].setPredictedRating(denormalizeHITSScore(updatedScores[j]));
-            }
+            //}
         }
     }
 
@@ -225,10 +250,11 @@ the values are only de-normalized
         //MatrixUtils.printVectorDouble(scoreVec);
         double sumScores = 0.0;
         for (int i = 0; i < scoreVec.length; i++) {
-            sumScores += scoreVec[i];
+                sumScores += scoreVec[i];
         }
         if (sumScores <= 0.0) {
             System.out.println("oh oh this is no good...");
+            return  scoreVec;
         }
 
         for (int i = 0; i < scoreVec.length; i++) {

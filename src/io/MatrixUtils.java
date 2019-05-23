@@ -107,8 +107,8 @@ public class MatrixUtils {
         for (int row = 0; row < matrix.length; row++) {
             double sum = 0;
             for (int column = 0; column < matrix[0].length; column++) {
-                //double adjWeight = matrix[row][column];
-                //double scr = vector[column];
+                double adjWeight = matrix[row][column];
+                double scr = vector[column];
                 sum += matrix[row][column] * (vector[column]);
             }
             updatedVec[row] = sum;

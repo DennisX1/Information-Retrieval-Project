@@ -2,6 +2,7 @@ package main;
 
 import LinkAnalysis.Evaluation;
 import LinkAnalysis.HITS;
+import LinkAnalysis.HITS_V2;
 import LinkAnalysis.PageRank;
 import Preprocessing.Stemmer;
 import Preprocessing.StopWordRemovalUtils;
@@ -9,6 +10,7 @@ import SimMeasuresUtils.TFIDFUtils;
 import SimMeasuresUtils.WordEmbeddingsUtils;
 import data.Review;
 import data.ReviewGraph;
+import io.MatrixUtils;
 import io.UtilsJson;
 
 /**
@@ -54,7 +56,7 @@ public class SentimentPropagation_Main {
 
         /*** WordEmbeddings with stop word removal */
         System.out.println("****Computing Word embeddings****");
-        double[][] wordEmbeddingSims = WordEmbeddingsUtils.calculateSimWordEmbeddingsUtils(cleaned);
+       // double[][] wordEmbeddingSims = WordEmbeddingsUtils.calculateSimWordEmbeddingsUtils(cleaned);
         System.out.println("****Finished WordEmbedding computing****");
 
         /*** Stemming */
@@ -68,29 +70,31 @@ public class SentimentPropagation_Main {
         double[][] tfIdfSims = TFIDFUtils.computeSimilarities(stemmed);
         System.out.println("****Finished TF-IDF computing****");
 
-        stemmed = null;
-        cleaned = null;
+
 
         double[] maxMinTFID = getMinMaxMatrix(tfIdfSims);
-        double[] maxMinEmbeddings = getMinMaxMatrix(wordEmbeddingSims);
+        //double[] maxMinEmbeddings = getMinMaxMatrix(wordEmbeddingSims);
 
         //Thresholding
 
+        double[][] tmp1 = MatrixUtils.matrixMultiplicationSameSize(tfIdfSims,tfIdfSims);
+        //double[][] tmp2 = MatrixUtils.matrixMultiplicationSameSize(wordEmbeddingSims, wordEmbeddingSims);
 
         System.out.println("****Performing Evaluation****");
-        for (int percentageKnownLabels = 5; percentageKnownLabels < 90; percentageKnownLabels += 5) {
+        for (int percentageKnownLabels = 5; percentageKnownLabels <= 90; percentageKnownLabels += 5) {
 
             Review.addKnownPercentage(5, reviews);
             //************************* RUN WITH TF-IDF  ******************/
             //   System.out.println("~~~~~~~RUN WITH TF_IDF~~~~~~~");
-            ReviewGraph graph = new ReviewGraph(reviews, tfIdfSims);
+            ReviewGraph graph = new ReviewGraph(reviews, tmp1);
             //System.out.println(graph.toString());
 
 
             /*** run HITS ALgo */
-            System.out.println("");
-            HITS HITS_algo = new HITS(graph, EPSILON, MAX_ITERATIONS, INIT_LABEL);
-            HITS_algo.runHITS();
+            //HITS HITS_algo = new HITS(graph, EPSILON, MAX_ITERATIONS, INIT_LABEL);
+            //HITS_algo.runHITS();
+            HITS_V2 HITS_algo = new HITS_V2(graph, EPSILON, MAX_ITERATIONS);
+            HITS_algo.run();
 
             System.out.println("Combination: TF-IDF/HITS           Known Labels: " + percentageKnownLabels + "%" +
                     "      MAE: " + Evaluation.calculateMAE(reviews) +
@@ -111,7 +115,7 @@ public class SentimentPropagation_Main {
             //************************* RUN WITH EMBEDDINGS ******************/
             //  System.out.println("\n~~~~~~~RUN WITH EMBEDDINGS~~~~~~~");
 
-            graph = new ReviewGraph(reviews, wordEmbeddingSims);
+           /* graph = new ReviewGraph(reviews, wordEmbeddingSims);
             //System.out.println(graph.toString());
 
             HITS_algo = new HITS(graph, EPSILON, MAX_ITERATIONS, INIT_LABEL);
@@ -124,10 +128,12 @@ public class SentimentPropagation_Main {
                     "      PCC: " + Evaluation.calculatePCC(reviews));
             System.out.println("CombinationV2: TF-IDF/HITS           Known Labels: " + percentageKnownLabels + "%" +
                     "      MAE: " + Evaluation.calculateMAE_standard(reviews) +
+
                     "      MSE: " + Evaluation.calculateMSE_standard(reviews) +
                     "      PCC: " + Evaluation.calculatePCC_standard(reviews));
-
+*/
             //*** Page Rank Embedding*////
+/*
 
             PageRank.performCalculations(reviews, wordEmbeddingSims);
 
@@ -137,6 +143,7 @@ public class SentimentPropagation_Main {
                     "      MSE: " + Evaluation.calculateMSE(reviews) +
                     "      PCC: " + Evaluation.calculatePCC(reviews));
 
+*/
 
         }
     }
@@ -168,13 +175,18 @@ public class SentimentPropagation_Main {
                 counterKomisch++;}
         }
     }
+
     private static double[] getMinMaxMatrix(double[][] matrix) {
-        double[] minmax = new double[2];
+        double[] minmax = new double[3];
         double min =2;
         double  max =-1;
+        int counterZero =0;
         for (int i = 0; i <  matrix.length; i++) {
             for (int j = i+1; j <matrix[i].length ; j++) {
                 //min
+                if (matrix[i][j] ==0.0){
+                    counterZero++;
+                }
                 if(matrix[i][j]<min && i != j && matrix[i][j]> 0.0){
                     min =matrix[i][j];
                 }
@@ -185,6 +197,7 @@ public class SentimentPropagation_Main {
         }
         minmax[0] =min;
         minmax[1] = max;
+        minmax[2] = counterZero;
         return  minmax;
     }
 }
