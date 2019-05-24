@@ -1,9 +1,13 @@
-package LinkAnalysis;
+package test;
 
 import data.Review;
 import data.ReviewGraph;
 import io.MatrixUtils;
 
+/**
+ * Class used to test out a second version of HITS - No improvement
+ * @author  N.Seemann
+ */
 public class HITS_V2 {
     private ReviewGraph g;
     private static double DELTA;
@@ -85,7 +89,7 @@ public class HITS_V2 {
         double[] tmp = new double[includedReviews.length];
         for (int i = 0; i < tmp.length ; i++) {
             if(includedReviews[i].isKnown()) {
-                tmp[i] = includedReviews[i].getNormalizedRating();
+                tmp[i] = includedReviews[i].getRealRating();
             }
             else{
                 tmp[i] = includedReviews[i].getPredictedRating();

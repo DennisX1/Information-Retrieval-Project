@@ -2,6 +2,11 @@ package LinkAnalysis;
 
 import data.Review;
 
+/**
+ * Class to evaluate the predication by the two Link Analysis Algorithms.
+ *
+ * @author R.Scholz
+ */
 public class Evaluation {
 
     /**
@@ -79,9 +84,14 @@ public class Evaluation {
         System.out.println("Mean square error is: " + calculateMSE(reviews));
     }
 
-    /****NORMAL AVG/
-     *
-     */
+
+
+
+
+
+
+    //*****Further Evaluations
+    //****Regular Calculation of Evaluation not considering the the same reviews
     public static double calculateMSE_standard(Review[] reviews) {
         double meanSqrError = 0;
         int counter = 0;
@@ -93,10 +103,6 @@ public class Evaluation {
             }
         }
         return meanSqrError / counter;
-    }
-
-    public static void calcAndPrintMSE_standard(Review[] reviews) {
-        System.out.println("Mean square error is: " + calculateMSE(reviews));
     }
 
     /**
@@ -117,14 +123,6 @@ public class Evaluation {
         }
         sum = sum / counter;
         return sum;
-    }
-
-    public static void calcAndPrintMAE_standard(Review[] reviews) {
-        System.out.println("\nMean absolute error is: " + calculateMAE(reviews));
-    }
-
-    public static void calculateAndPrintPCC_standard(Review[] reviews) {
-        System.out.println("\nPearson correlation coefficient: " + calculatePCC(reviews));
     }
 
     public static double calculatePCC_standard(Review[] reviews) {
@@ -155,6 +153,18 @@ public class Evaluation {
             }
         }
         return top / (Math.sqrt(bottomLeft) * Math.sqrt(bottomRight));
+    }
+
+    public static void calcAndPrintMAE_standard(Review[] reviews) {
+        System.out.println("\nMean absolute error (STD) is: " + calculateMAE(reviews));
+    }
+
+    public static void calculateAndPrintPCC_standard(Review[] reviews) {
+        System.out.println("\nPearson correlation coefficient (STD): " + calculatePCC(reviews));
+    }
+
+    public static void calcAndPrintMSE_standard(Review[] reviews) {
+        System.out.println("Mean square error (STD) is: " + calculateMSE(reviews));
     }
 }
 

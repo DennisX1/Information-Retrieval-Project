@@ -12,9 +12,12 @@ import data.Review;
 
 import org.json.JSONObject;
 
-
+/**
+ * Class to read of the Amazon Instant Video Reviews.
+ *
+ * @author R.Scholz
+ */
 public class UtilsJson {
-
     private final static double evaluationPercentage = 0.1;
 
     /**
@@ -138,7 +141,7 @@ public class UtilsJson {
         return reviews.toArray(new Review[0]);
 
     }
-
+/*
     public static void main(String[] args) {
         try {
             Review[] reviews = getReviewsFromDataset(3, 50, Dataset.AMAZON_INSTANT_VIDEO);
@@ -187,7 +190,7 @@ public class UtilsJson {
         double[][] c = matrixMult(a, b);
         System.out.println("[" + c[0][0] + "," + c[1][0] + "]");
         System.out.println(c.length);
-    }
+    }*/
 
     public enum Dataset {
         AMAZON_INSTANT_VIDEO("data/Amazon_Instant_Video_5.json", 37126, 4.209529709637451);
@@ -241,6 +244,4 @@ public class UtilsJson {
         }
         return c;
     }
-
-
 }

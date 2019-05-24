@@ -1,4 +1,4 @@
-package main;
+package test;
 
 import Preprocessing.Stemmer;
 import Preprocessing.StopWordRemovalUtils;

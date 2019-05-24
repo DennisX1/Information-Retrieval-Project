@@ -11,12 +11,11 @@ import java.util.Map;
 /**
  * Class to represent the HITS algorithm. It is a slight variation to the original implementation.
  * Assumptions: HubScore = AuthScore  => therefore, we introduce HITS_Score as the only score
- * Update Matrix L*L^T = L^T*L
  * Updating rule: score^k = L * score^(k-1)
  * Update Matrix L <=> weighted Graph of reviews
  */
 public class HITS {
-     //private ReviewGraph similarityGraph;
+    //private ReviewGraph similarityGraph;
     private Review[] reviews;
     private int quantityReviews;
     private double[][] adjacencyMatrix;
@@ -31,7 +30,7 @@ public class HITS {
      *
      * @param graph Review[] - Array of reviews that should be included
      */
-    public HITS(ReviewGraph graph, double delta, int iterationLimit, double initLabel){//, boolean zNormalization) {
+    public HITS(ReviewGraph graph, double delta, int iterationLimit, double initLabel) {//, boolean zNormalization) {
         //similarityGraph = graph;
         quantityReviews = graph.getReviewQuantity();
         reviews = graph.getIncludedReviews();
@@ -42,15 +41,15 @@ public class HITS {
         MAX_ITERATIONS = iterationLimit;
         INIT_LABEL = initLabel;
         // no transformation needed since it is an undirected graph
-        //double[][] tmp = generateUpdateMatrix(graph.getGraph());
-        adjacencyMatrix =  generateUpdateMatrix(graph.getGraph());
+        adjacencyMatrix = generateUpdateMatrix(graph.getGraph());
     }
+
     /**
-     * Constructor of the HITS Algorithm.
+     * Constructor of the HITS Algorithm. Used for the second round of the evaluation
      *
      * @param graph Review[] - Array of reviews that should be included
      */
-    public HITS(ReviewGraph graph, double delta, int iterationLimit, double initLabel, double[][] AA){//, boolean zNormalization) {
+    public HITS(ReviewGraph graph, double delta, int iterationLimit, double initLabel, double[][] AA) {//, boolean zNormalization) {
         //similarityGraph = graph;
         quantityReviews = graph.getReviewQuantity();
         reviews = graph.getIncludedReviews();
@@ -60,9 +59,7 @@ public class HITS {
         EPSILON = delta;
         MAX_ITERATIONS = iterationLimit;
         INIT_LABEL = initLabel;
-        // no transformation needed since it is an undirected graph
-
-        adjacencyMatrix =  AA;
+        adjacencyMatrix = AA;
     }
 
     /**
@@ -74,18 +71,21 @@ public class HITS {
      * @return double[][] adjacency matrix  a diagonal filled with zeros.
      */
     private double[][] generateUpdateMatrix(double[][] weightedGraph) {
-        int counter =0; int counterZero=0;
+        int counter = 0;
+        int counterZero = 0;
         double[][] adjustedGraph = new double[weightedGraph.length][weightedGraph.length];
         for (int i = 0; i < weightedGraph.length; i++) {
             for (int j = 0; j < weightedGraph[i].length; j++) {
-                /*if (weightedGraph[i][j] == 0.0) {
+                //statistics of edges for evaluation only
+                /*
+                if (weightedGraph[i][j] == 0.0) {
                     adjustedGraph[i][j] = 0;
                     counterZero++;
                 }else if(weightedGraph[i][j] < 0.5){
                     adjustedGraph[i][j] =0;
                     counter++;
                 }else {*/
-                    adjustedGraph[i][j] = weightedGraph[i][j];
+                adjustedGraph[i][j] = weightedGraph[i][j];
                 //}
                 if (i == j) {
                     adjustedGraph[i][j] = 0.0;
@@ -96,7 +96,6 @@ public class HITS {
     }
 
     /**
-     *
      * Method the trigger the HITS Algorithm.
      */
     public void runHITS() {
@@ -109,7 +108,6 @@ public class HITS {
             double[] oldScores = getOldScores();
             //MatrixUtils.printVectorDouble(oldScores);
             //Multiply and save in HitScores
-            double[][] A = {{1,2,3,4},{5,0,0,8},{9,0,0,3},{4,5,6,7}};
             updatedScores = MatrixUtils.multiplyMatrixVector(adjacencyMatrix, oldScores);
 
             // normalize Scores
@@ -121,9 +119,9 @@ public class HITS {
             iterations++;
         }
         //****make it a prob. distribution ***/
-/* as discussed we do not normalize after the last iteration to make
-the evaluation results comparable between PageRank and HITS
-the values are only de-normalized
+        /* as discussed we do not normalize after the last iteration to make
+        the evaluation results comparable between PageRank and HITS
+        the values are only de-normalized
         double maxVal = getMax(updatedScores);
 
         if (useZNormalization){
@@ -138,30 +136,57 @@ the values are only de-normalized
 
     }
 
+    /**
+     * Method to divide the scores by the maximal score to normalize them.
+     *
+     * @param updatedScores double[] vector of scores
+     * @param maxVal        double max value by which the scores are divided
+     */
     private void makeProbDistribution(double[] updatedScores, double maxVal) {
         for (int i = 0; i < updatedScores.length; i++) {
             updatedScores[i] = updatedScores[i] / maxVal;
         }
     }
+
+    /**
+     * Method to z-Normalize the scores. NOT USED.
+     *
+     * @param updatedScores double[] vector of scores
+     * @param maxVal        double max value by which the scores are normalized
+     * @param minVal        double min value by which the scores are normalized
+     */
     private void zNormalize(double[] updatedScores, double maxVal, double minVal) {
         for (int i = 0; i < updatedScores.length; i++) {
-            updatedScores[i] = (updatedScores[i] - minVal) / (maxVal- minVal);
+            updatedScores[i] = (updatedScores[i] - minVal) / (maxVal - minVal);
         }
     }
 
+    /**
+     * Method to obtain the max. value contained in a vector.
+     *
+     * @param updatedScores double[] vector for scores
+     * @return double max value
+     */
     private double getMax(double[] updatedScores) {
-        double max =-1.0;
-        for ( double d: updatedScores  ) {
-            if (d > max){
+        double max = -1.0;
+        for (double d : updatedScores) {
+            if (d > max) {
                 max = d;
             }
         }
         return max;
     }
+
+    /**
+     * Method to obtain the min. value contained in a vector.
+     *
+     * @param updatedScores double[] vector for scores
+     * @return double min value
+     */
     private double getMin(double[] updatedScores) {
-        double min =1.0;
-        for ( double d: updatedScores  ) {
-            if (d < min){
+        double min = 1.0;
+        for (double d : updatedScores) {
+            if (d < min) {
                 min = d;
             }
         }
@@ -222,7 +247,7 @@ the values are only de-normalized
     private void writePredictions(double[] updatedScores) {
         for (int j = 0; j < quantityReviews; j++) { // for each node get score
             //if (!reviews[j].isKnown()) {
-                reviews[j].setPredictedRating(denormalizeHITSScore(updatedScores[j]));
+            reviews[j].setPredictedRating(denormalizeHITSScore(updatedScores[j]));
             //}
         }
     }
@@ -250,17 +275,17 @@ the values are only de-normalized
         //MatrixUtils.printVectorDouble(scoreVec);
         double sumScores = 0.0;
         for (int i = 0; i < scoreVec.length; i++) {
-                sumScores += scoreVec[i];
+            sumScores += scoreVec[i];
         }
         if (sumScores <= 0.0) {
             System.out.println("oh oh this is no good...");
-            return  scoreVec;
+            return scoreVec;
         }
 
         for (int i = 0; i < scoreVec.length; i++) {
-                scoreVec[i] = scoreVec[i] / sumScores;
+            scoreVec[i] = scoreVec[i] / sumScores;
         }
-       // MatrixUtils.printVectorDouble(scoreVec);
+        // MatrixUtils.printVectorDouble(scoreVec);
         return scoreVec;
     }
 
@@ -282,7 +307,7 @@ the values are only de-normalized
                 reviews[i].setPredictedRating(scoreVecHITS[i]);
             }
         }
-        converged= allConverged;
+        converged = allConverged;
     }
 
     /**
@@ -296,10 +321,10 @@ the values are only de-normalized
 
     /**
      * Method to obtain the matrix of Reviews.
+     *
      * @return
      */
     public Review[] getReviews() {
         return reviews;
     }
-
 }
