@@ -9,6 +9,11 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+/**
+ *
+ * Test class to test stopword removal + tfidf + word embeddings
+ * @author Dennis
+ */
 
 public class RepresentationTest {
 
