@@ -37,7 +37,7 @@ public class WordEmbeddingsUtils {
      * Method to reduce the size of the original FastText file
      * Is only used once
      */
-    private void createFile(int threshold, String pathname) {
+    private static void createFile(int threshold, String pathname) {
         int counter = 0;
         try (BufferedReader br = new BufferedReader(new FileReader("data/wiki-news-300d-1M.vec"))) {
             File file = new File("data/" + pathname);
@@ -200,5 +200,13 @@ public class WordEmbeddingsUtils {
         return cosineArray;
 
     }
+
+
+    public static void main(String[] args) {
+
+        createFile(300000, "DenseVector.txt");
+
+    }
+
 
 }
