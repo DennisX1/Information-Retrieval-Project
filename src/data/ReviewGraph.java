@@ -11,8 +11,13 @@ public class ReviewGraph {
     private double[][] weightedGraph; // fully connected weightedGraph
     private Review[] includedReviews;
 
+    /**
+     * Constructor of the class, where reviews are added later-on.
+     *
+     * @param numberOfReviewNodes how many reviews should the graph contain
+     */
     public ReviewGraph(int numberOfReviewNodes) {
-        weightedGraph = new double[numberOfReviewNodes][numberOfReviewNodes]; // cannot spare a row, due to HITS algo
+        weightedGraph = new double[numberOfReviewNodes][numberOfReviewNodes];
     }
 
     /**

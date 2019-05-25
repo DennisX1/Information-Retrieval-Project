@@ -7,6 +7,11 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Random;
 
+/**
+ * Class the represents the PageRank Algorithm.
+ *
+ * @author R.Scholz
+ */
 public class PageRank {
     public static final double EPSILON = 0.001;
     public static final int MAX_ITERATIONS = 200;
@@ -90,8 +95,6 @@ public class PageRank {
         }
         return true;
     }
-
-
 }
 
 

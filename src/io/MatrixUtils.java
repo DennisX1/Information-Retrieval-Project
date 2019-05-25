@@ -74,6 +74,13 @@ public class MatrixUtils {
         return tmp;
     }
 
+    /**
+     * Method to multiply two 2-dim. arrays (Matrices) of the same size.
+     *
+     * @param matrix1 double [][]  2-dim. array/matrix
+     * @param matrix2 double [][]  2-dim. array/matrix, same size as matrix1
+     * @return double[][] transposed 2-dim. array/matrix
+     */
     public static double[][] matrixMultiplicationSameSize(double[][] matrix1, double[][] matrix2) {
         if (matrix1.length == matrix2.length) {
             double[][] tmp = new double[matrix1.length][matrix1.length];
@@ -90,11 +97,6 @@ public class MatrixUtils {
         return null;
     }
 
-
-    /*public static double[]  updateScoresHITS(double[][] adjacencyMatrix,  double[] scoreVector){
-        return multiplyMatrixVector(adjacencyMatrix, scoreVector);
-    }*/
-
     /**
      * Method to multiply a 2-dim. array/matrix with an 1-dim. array/vector
      *
@@ -107,8 +109,8 @@ public class MatrixUtils {
         for (int row = 0; row < matrix.length; row++) {
             double sum = 0;
             for (int column = 0; column < matrix[0].length; column++) {
-                //double adjWeight = matrix[row][column];
-                //double scr = vector[column];
+                double adjWeight = matrix[row][column];
+                double scr = vector[column];
                 sum += matrix[row][column] * (vector[column]);
             }
             updatedVec[row] = sum;
