@@ -78,7 +78,7 @@ public class SentimentPropagation_Main {
 
 
         System.out.println("****Performing Evaluation****");
-        for (int percentageKnownLabels = 5; percentageKnownLabels < 90; percentageKnownLabels += 5) {
+        for (int percentageKnownLabels = 5; percentageKnownLabels <= 95; percentageKnownLabels += 5) {
 
             Review.addKnownPercentage(5, reviews);
             //************************* RUN WITH TF-IDF  ******************/
