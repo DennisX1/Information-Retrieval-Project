@@ -85,8 +85,11 @@ public class HITSTest {
         //______________________PREPARATIONS__________
         Review[] reviews = new Review[QUANTITY_REVIEWS];
         reviews[0] = new Review("a", 1.0, true);
+        reviews[0].setEvalReview(false);
         reviews[1] = new Review("ab", 5.0, true);
+        reviews[1].setEvalReview(false);
         reviews[2] = new Review("abc", 4.0, false);
+        reviews[2].setEvalReview(true);
 
         double[][] testSimilarities = {{1.0, 0.3, 0.7},
                 {0.1, 1.0, 0.8},
